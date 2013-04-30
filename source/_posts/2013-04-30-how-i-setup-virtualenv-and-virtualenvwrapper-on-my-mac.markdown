@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "How I Setup My VirtualEnv"
-date: 2013-04-30 13:21
+title: "How I Setup VirtualEnv and VirtualEnvWrapper on my Mac"
+date: 2013-04-30 14:23
 comments: true
 categories: python mac virtualenv virtualenvwrapper
 ---
