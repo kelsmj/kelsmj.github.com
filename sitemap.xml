@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
+    <url>
+        <loc>http://kelsmj.github.com/2011/07/03/Flickr-oAuth-Python-Example/</loc>
+        <lastmod>2013-05-01T06:28:51-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://kelsmj.github.com/2011/07/09/Flickr-Api-Grab-Photos-Example/</loc>
+        <lastmod>2013-05-01T06:28:51-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://kelsmj.github.com/2011/09/16/Mac-Apache-VirtualHosts-Symlinks/</loc>
+        <lastmod>2013-05-01T06:28:51-04:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/
+        </loc>
+        <lastmod>2013-05-01T06:28:51-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://kelsmj.github.com/blog/archives/</loc>
+        <lastmod>2013-05-01T06:28:51-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://kelsmj.github.com/</loc>
+        <lastmod>2013-05-01T06:28:51-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://kelsmj.github.com/robots.txt</loc>
+        <lastmod>2013-05-01T06:28:51-04:00</lastmod>
+    </url>
+</urlset>

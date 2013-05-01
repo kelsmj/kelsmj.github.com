@@ -1,0 +1,424 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>How I Setup VirtualEnv and VirtualEnvWrapper on my Mac - Matt Kelsey</title>
+  <meta name="author" content="Matt Kelsey">
+
+  
+  <meta name="description" content="The following are the steps I take to setup up VirtualEnv and VirtualEnvWrapper on a new machine. Make sure pip is installed by running pip in the &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Matt Kelsey" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-24177797-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+  <meta name="google-site-verification" content="GUgyJAFmKA6KYKpjqo4O-O-YGmCLDUDE7FkXu07PMho" />
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Matt Kelsey</a></h1>
+  
+    <h2>Technical notes, thoughts and examples</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:kelsmj.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">How I Setup VirtualEnv and VirtualEnvWrapper on My Mac</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-30T14:23:00-04:00" pubdate data-updated="true">Apr 30<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>The following are the steps I take to setup up <a href="http://www.virtualenv.org/en/latest/">VirtualEnv</a> and <a href="http://virtualenvwrapper.readthedocs.org/en/latest/">VirtualEnvWrapper</a> on a new machine.</p>
+
+<ul>
+<li><p>Make sure pip is installed by running pip in the terminal.</p></li>
+<li><p>If it isn&#8217;t installed, install by doing</p></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo easy_install pip</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Next, install virtualenv and virtualenvwrapper</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo pip install virtualenvwrapper</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo pip install virtualenvwrapper</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Open up your .bash_profile or .profile, and after your PATH statement, add the following</li>
+</ul>
+
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>    <span class="c"># set where virutal environments will live</span>
+</span><span class='line'>    <span class="nb">export </span><span class="nv">WORKON_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/.virtualenvs
+</span><span class='line'>    <span class="c"># ensure all new environments are isolated from the site-packages directory</span>
+</span><span class='line'>    <span class="nb">export </span><span class="nv">VIRTUALENVWRAPPER_VIRTUALENV_ARGS</span><span class="o">=</span><span class="s1">&#39;--no-site-packages&#39;</span>
+</span><span class='line'>    <span class="c"># use the same directory for virtualenvs as virtualenvwrapper</span>
+</span><span class='line'>    <span class="nb">export </span><span class="nv">PIP_VIRTUALENV_BASE</span><span class="o">=</span><span class="nv">$WORKON_HOME</span>
+</span><span class='line'>    <span class="c"># makes pip detect an active virtualenv and install to it</span>
+</span><span class='line'>    <span class="nb">export </span><span class="nv">PIP_RESPECT_VIRTUALENV</span><span class="o">=</span><span class="nb">true</span>
+</span><span class='line'><span class="nb">    </span><span class="k">if</span> <span class="o">[[</span> -r /usr/local/bin/virtualenvwrapper.sh <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">        </span><span class="nb">source</span> /usr/local/bin/virtualenvwrapper.sh
+</span><span class='line'>    <span class="k">else</span>
+</span><span class='line'><span class="k">        </span><span class="nb">echo</span> <span class="s2">&quot;WARNING: Can&#39;t find virtualenvwrapper.sh&quot;</span>
+</span><span class='line'>    <span class="k">fi</span>
+</span><span class='line'>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><p>Open a new terminal window.  You should see virtualenvwrapper.sh being run and setting up your .virtualenvs directory.</p></li>
+<li><p>Test creating a new virtualenv</p></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ mkvirtualenv testenv</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>You should see something in the console like</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>New python executable in testenv/bin/python
+</span><span class='line'>Installing setuptools............done.
+</span><span class='line'>Installing pip...............done.
+</span><span class='line'>virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/predeactivate
+</span><span class='line'>virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/postdeactivate
+</span><span class='line'>virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/preactivate
+</span><span class='line'>virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/postactivate
+</span><span class='line'>virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/get_env_details</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><p>That should put you into a new virtualenv called &#8220;testenv&#8221;</p></li>
+<li><p>Lets install some packages and create a requirements.txt file</p></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ pip install rq
+</span><span class='line'>$ pip install requests
+</span><span class='line'>$ pip install google-api-python-client
+</span><span class='line'>$ pip freeze &gt; requirements.txt</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li><p>Your have just installed 3 python packages into your virtual environment, and created a .txt file that will have all the necessary information in order to reproduce your environment.</p></li>
+<li><p>You can leave your virtualenv by doing</p></li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>deactivate testenv</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>To create a new virtualenv, and install the libraries based on the requirements.txt file you just created, just do the following.</li>
+</ul>
+
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mkvirtualenv testenv2
+</span><span class='line'>pip install -r requirements.txt</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>List of commonly used commands
+
+<ul>
+<li>mkvirtualenv (create a new virtualenv)</li>
+<li>rmvirtualenv (remove an existing virtualenv)</li>
+<li>workon (change the current virtualenv)</li>
+<li>add2virtualenv (add external packages in a .pth file to current virtualenv)</li>
+<li>cdsitepackages (cd into the site-packages directory of current virtualenv)</li>
+<li>cdvirtualenv (cd into the root of the current virtualenv)</li>
+<li>deactivate (deactivate virtualenv, which calls several hooks)</li>
+</ul>
+</li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Matt Kelsey</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-30T14:23:00-04:00" pubdate data-updated="true">Apr 30<span>th</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/mac/'>mac</a>, <a class='category' href='/blog/categories/python/'>python</a>, <a class='category' href='/blog/categories/virtualenv/'>virtualenv</a>, <a class='category' href='/blog/categories/virtualenvwrapper/'>virtualenvwrapper</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/" data-via="kelsmj" data-counturl="http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2011/09/16/Mac-Apache-VirtualHosts-Symlinks/" title="Previous Post: Using Symlinks and Virtual hosts to serve pages outside of Sites directory using Apache on the MAC">&laquo; Using Symlinks and Virtual hosts to serve pages outside of Sites directory using Apache on the MAC</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/">How I Setup VirtualEnv and VirtualEnvWrapper on my Mac</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2011/09/16/Mac-Apache-VirtualHosts-Symlinks/">Using Symlinks and Virtual hosts to serve pages outside of Sites directory using Apache on the MAC</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2011/07/09/Flickr-Api-Grab-Photos-Example/">Download Photos From Flickr Via API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2011/07/03/Flickr-oAuth-Python-Example/">OAuth User Authentication for Flickr in Python</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/kelsmj">@kelsmj</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'kelsmj',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Matt Kelsey -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mattkelseyblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/';
+        var disqus_url = 'http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

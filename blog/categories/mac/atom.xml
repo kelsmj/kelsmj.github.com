@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: mac | Matt Kelsey]]></title>
+  <link href="http://kelsmj.github.com/blog/categories/mac/atom.xml" rel="self"/>
+  <link href="http://kelsmj.github.com/"/>
+  <updated>2013-05-01T06:29:50-04:00</updated>
+  <id>http://kelsmj.github.com/</id>
+  <author>
+    <name><![CDATA[Matt Kelsey]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[How I Setup VirtualEnv and VirtualEnvWrapper on my Mac]]></title>
+    <link href="http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/"/>
+    <updated>2013-04-30T14:23:00-04:00</updated>
+    <id>http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac</id>
+    <content type="html"><![CDATA[<p>The following are the steps I take to setup up <a href="http://www.virtualenv.org/en/latest/">VirtualEnv</a> and <a href="http://virtualenvwrapper.readthedocs.org/en/latest/">VirtualEnvWrapper</a> on a new machine.</p>
+
+<ul>
+<li><p>Make sure pip is installed by running pip in the terminal.</p></li>
+<li><p>If it isn't installed, install by doing</p></li>
+</ul>
+
+
+<p><code>   
+sudo easy_install pip
+</code></p>
+
+<ul>
+<li>Next, install virtualenv and virtualenvwrapper</li>
+</ul>
+
+
+<p><code>
+sudo pip install virtualenvwrapper
+</code></p>
+
+<p><code>
+sudo pip install virtualenvwrapper
+</code></p>
+
+<ul>
+<li><p>Open up your .bash_profile or .profile, and after your PATH statement, add the following</p>
+
+<p>  <div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>  <span class="c"># set where virutal environments will live</span>
+</span><span class='line'>  <span class="nb">export </span><span class="nv">WORKON_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/.virtualenvs
+</span><span class='line'>  <span class="c"># ensure all new environments are isolated from the site-packages directory</span>
+</span><span class='line'>  <span class="nb">export </span><span class="nv">VIRTUALENVWRAPPER_VIRTUALENV_ARGS</span><span class="o">=</span><span class="s1">&#39;--no-site-packages&#39;</span>
+</span><span class='line'>  <span class="c"># use the same directory for virtualenvs as virtualenvwrapper</span>
+</span><span class='line'>  <span class="nb">export </span><span class="nv">PIP_VIRTUALENV_BASE</span><span class="o">=</span><span class="nv">$WORKON_HOME</span>
+</span><span class='line'>  <span class="c"># makes pip detect an active virtualenv and install to it</span>
+</span><span class='line'>  <span class="nb">export </span><span class="nv">PIP_RESPECT_VIRTUALENV</span><span class="o">=</span><span class="nb">true</span>
+</span><span class='line'><span class="nb">  </span><span class="k">if</span> <span class="o">[[</span> -r /usr/local/bin/virtualenvwrapper.sh <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;  <span class="nb">source</span> /usr/local/bin/virtualenvwrapper.sh
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;  <span class="nb">echo</span> <span class="s2">&quot;WARNING: Can&#39;t find virtualenvwrapper.sh&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">fi</span>
+</span><span class='line'>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
+<li><p>Open a new terminal window.  You should see virtualenvwrapper.sh being run and setting up your .virtualenvs directory.</p></li>
+<li><p>Test creating a new virtualenv</p></li>
+</ul>
+
+
+<p><code>
+$ mkvirtualenv testenv
+</code></p>
+
+<ul>
+<li>You should see something in the console like</li>
+</ul>
+
+
+<p><code>
+New python executable in testenv/bin/python
+Installing setuptools............done.
+Installing pip...............done.
+virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/predeactivate
+virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/postdeactivate
+virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/preactivate
+virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/postactivate
+virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/get_env_details
+</code></p>
+
+<ul>
+<li><p>That should put you into a new virtualenv called "testenv"</p></li>
+<li><p>Lets install some packages and create a requirements.txt file</p></li>
+</ul>
+
+
+<p><code>
+$ pip install rq
+$ pip install requests
+$ pip install google-api-python-client
+$ pip freeze &gt; requirements.txt
+</code></p>
+
+<ul>
+<li><p>Your have just installed 3 python packages into your virtual environment, and created a .txt file that will have all the necessary information in order to reproduce your environment.</p></li>
+<li><p>You can leave your virtualenv by doing</p></li>
+</ul>
+
+
+<p><code>
+deactivate testenv
+</code></p>
+
+<ul>
+<li>To create a new virtualenv, and install the libraries based on the requirements.txt file you just created, just do the following.</li>
+</ul>
+
+
+<p><code>
+mkvirtualenv testenv2
+pip install -r requirements.txt
+</code></p>
+
+<ul>
+<li>List of commonly used commands
+
+<ul>
+<li>mkvirtualenv (create a new virtualenv)</li>
+<li>rmvirtualenv (remove an existing virtualenv)</li>
+<li>workon (change the current virtualenv)</li>
+<li>add2virtualenv (add external packages in a .pth file to current virtualenv)</li>
+<li>cdsitepackages (cd into the site-packages directory of current virtualenv)</li>
+<li>cdvirtualenv (cd into the root of the current virtualenv)</li>
+<li>deactivate (deactivate virtualenv, which calls several hooks)</li>
+</ul>
+</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using Symlinks and Virtual hosts to serve pages outside of Sites directory using Apache on the MAC]]></title>
+    <link href="http://kelsmj.github.com/2011/09/16/Mac-Apache-VirtualHosts-Symlinks/"/>
+    <updated>2011-09-16T14:30:00-04:00</updated>
+    <id>http://kelsmj.github.com/2011/09/16/Mac-Apache-VirtualHosts-Symlinks</id>
+    <content type="html"><![CDATA[<p>I like keeping all my code and websites in a single "Code" directory on my machine, but it isn't straightforward, from what I can tell, to get Apache on the MAC
+to serve up pages anywhere outside of the default "Sites" directory that is created when you enable "Web Sharing" on the MAC.<br/>
+After doing a lot of searching, I finally found a solution that works for me.</p>
+
+<p>I doubt this is the only solution, or even the "proper" solution, but it seems to work.</p>
+
+<p>Below are all the steps I took in order to serve pages out of directories other then those in the "Sites" directory.  For these steps, I will assume there is an existing directory of "~/Code/MyWebSite" that has a simple "Hello World" index.html file in it.</p>
+
+<ul>
+<li><p>Enable Web Sharing on the MAC by going to System Prefrences --> Sharing --> Check Enable Web Sharing</p></li>
+<li><p>Edit your <i>username</i>.conf file located in /private/etc/apache2/users and add the "FollowSymLinks" directive</p>
+
+<p>  <div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Directory "/Users/yourUserName/Sites/">&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>  Options Indexes MultiViews FollowSymLinks
+</span><span class='line'>  AllowOverride None
+</span><span class='line'>  Order allow,deny
+</span><span class='line'>  Allow from all
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p>  &lt;/Directory></span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
+<li><p>Edit the /private/etc/apache2/httpd.conf file and make sure the line under "# Virtual hosts" is not commented out, like so:</p>
+
+<p>  <div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Include /private/etc/apache2/extra/httpd-vhosts.conf</span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
+<li><p>Edit the /private/etc/apache2/extra/httpd-vhosts.conf file and add:</p>
+
+<p>  <div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;VirtualHost *:80>&lt;/p>
+</span><span class='line'>
+</span><span class='line'>&lt;pre>&lt;code>  &lt;Directory /Users/yourUserName/Sites/MyWebSite.com&gt;
+</span><span class='line'>      Options +FollowSymlinks +SymLinksIfOwnerMatch
+</span><span class='line'>      AllowOverride All
+</span><span class='line'>  &lt;/Directory&gt;
+</span><span class='line'>DocumentRoot /Users/yourUserName/Sites/MyWebSite
+</span><span class='line'>ServerName MyWebSite.local
+</span><span class='line'>&lt;/code>&lt;/pre>
+</span><span class='line'>
+</span><span class='line'>&lt;p>  &lt;/VirtualHost></span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
+<li><p>Edit the /etc/hosts file and add this at the top:</p>
+
+<p>  <div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>127.0.0.1 MyWebSite.local</span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
+<li><p>Make a Symlink to link your Code directory to one in the Sites directory.</p>
+
+<p>  <div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ln -s ~/Code/MyWebSite ~/Sites/MyWebSite</span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
+<li><p>Run apachectl to check config file syntax.</p>
+
+<p>  <div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apachectl -t</span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
+<li><p>Restart Apache</p>
+
+<p>  <div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apachectl restart</span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
+<li><p>Open a browser and go to MyWebSite.local and you should see the results.</p></li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>

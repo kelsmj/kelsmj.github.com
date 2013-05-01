@@ -1,113 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
 
-<!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <title>Matt Kelsey</title>
-  <meta name="author" content="Matt Kelsey">
-
-  
-  <meta name="description" content="The following are the steps I take to setup up VirtualEnv and VirtualEnvWrapper on a new machine. Make sure pip is installed by running pip in the &hellip;">
-  
-
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  
-  <link rel="canonical" href="http://kelsmj.github.com">
-  <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="Matt Kelsey" type="application/atom+xml">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
-  
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-24177797-1']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
-
-
-  <meta name="google-site-verification" content="GUgyJAFmKA6KYKpjqo4O-O-YGmCLDUDE7FkXu07PMho" />
-</head>
-
-<body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">Matt Kelsey</a></h1>
-  
-    <h2>Technical notes, thoughts and examples</h2>
-  
-</hgroup>
-
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="http://google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:kelsmj.github.com" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-</ul>
-
-</nav>
-  <div id="main">
-    <div id="content">
-      <div class="blog-index">
-  
-  
-  
-    <article>
-      
-  <header>
+  <title><![CDATA[Matt Kelsey]]></title>
+  <link href="http://kelsmj.github.com/atom.xml" rel="self"/>
+  <link href="http://kelsmj.github.com/"/>
+  <updated>2013-05-01T06:29:50-04:00</updated>
+  <id>http://kelsmj.github.com/</id>
+  <author>
+    <name><![CDATA[Matt Kelsey]]></name>
     
-      <h1 class="entry-title"><a href="/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/">How I Setup VirtualEnv and VirtualEnvWrapper on My Mac</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
 
   
-
-
-<time datetime="2013-04-30T14:23:00-04:00" pubdate data-updated="true">Apr 30<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>The following are the steps I take to setup up <a href="http://www.virtualenv.org/en/latest/">VirtualEnv</a> and <a href="http://virtualenvwrapper.readthedocs.org/en/latest/">VirtualEnvWrapper</a> on a new machine.</p>
+  <entry>
+    <title type="html"><![CDATA[How I Setup VirtualEnv and VirtualEnvWrapper on my Mac]]></title>
+    <link href="http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/"/>
+    <updated>2013-04-30T14:23:00-04:00</updated>
+    <id>http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac</id>
+    <content type="html"><![CDATA[<p>The following are the steps I take to setup up <a href="http://www.virtualenv.org/en/latest/">VirtualEnv</a> and <a href="http://virtualenvwrapper.readthedocs.org/en/latest/">VirtualEnvWrapper</a> on a new machine.</p>
 
 <ul>
 <li><p>Make sure pip is installed by running pip in the terminal.</p></li>
@@ -255,42 +166,15 @@
 </li>
 </ul>
 
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2011/09/16/Mac-Apache-VirtualHosts-Symlinks/">Using Symlinks and Virtual Hosts to Serve Pages Outside of Sites Directory Using Apache on the MAC</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-09-16T14:30:00-04:00" pubdate data-updated="true">Sep 16<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I like keeping all my code and websites in a single &#8220;Code&#8221; directory on my machine, but it isn&#8217;t straightforward, from what I can tell, to get Apache on the MAC
+  <entry>
+    <title type="html"><![CDATA[Using Symlinks and Virtual hosts to serve pages outside of Sites directory using Apache on the MAC]]></title>
+    <link href="http://kelsmj.github.com/2011/09/16/Mac-Apache-VirtualHosts-Symlinks/"/>
+    <updated>2011-09-16T14:30:00-04:00</updated>
+    <id>http://kelsmj.github.com/2011/09/16/Mac-Apache-VirtualHosts-Symlinks</id>
+    <content type="html"><![CDATA[<p>I like keeping all my code and websites in a single &#8220;Code&#8221; directory on my machine, but it isn&#8217;t straightforward, from what I can tell, to get Apache on the MAC
 to serve up pages anywhere outside of the default &#8220;Sites&#8221; directory that is created when you enable &#8220;Web Sharing&#8221; on the MAC.<br/>
 After doing a lot of searching, I finally found a solution that works for me.</p>
 
@@ -397,42 +281,15 @@ After doing a lot of searching, I finally found a solution that works for me.</p
 <li>Open a browser and go to MyWebSite.local and you should see the results.</li>
 </ul>
 
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2011/07/09/Flickr-Api-Grab-Photos-Example/">Download Photos From Flickr via API</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-07-09T14:30:00-04:00" pubdate data-updated="true">Jul 9<span>th</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>In my <a href="http://mkelsey.com/2011/07/03/Flickr-oAuth-Python-Example.html">previous post</a>, I gave an example of how to authenticate a user against the Flickr API using their new OAuth authentication scheme.</p>
+  <entry>
+    <title type="html"><![CDATA[Download Photos From Flickr Via API]]></title>
+    <link href="http://kelsmj.github.com/2011/07/09/Flickr-Api-Grab-Photos-Example/"/>
+    <updated>2011-07-09T14:30:00-04:00</updated>
+    <id>http://kelsmj.github.com/2011/07/09/Flickr-Api-Grab-Photos-Example</id>
+    <content type="html"><![CDATA[<p>In my <a href="http://mkelsey.com/2011/07/03/Flickr-oAuth-Python-Example.html">previous post</a>, I gave an example of how to authenticate a user against the Flickr API using their new OAuth authentication scheme.</p>
 
 <p>I am going to expand on that post a bit, and show you how to download all the images for a given photo using the <a href="http://www.flickr.com/services/api/explore/flickr.photos.getSizes">flickr.photos.getSizes</a> API call.</p>
 
@@ -695,42 +552,15 @@ After doing a lot of searching, I finally found a solution that works for me.</p
 <p>If all went well, you should now have files in your directory for all the different sizes of the photo you specified.</p>
 
 <p>Feel free to email me with any questions or comments.  The git repo for this is located <a href="https://github.com/kelsmj/FlickrOAuth">here</a>.</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/2011/07/03/Flickr-oAuth-Python-Example/">OAuth User Authentication for Flickr in Python</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2011-07-03T14:30:00-04:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2011</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I always wanted to write an application that will use the Flickr API to pull all my photos from Flickr and store them locally, so I can further back them up via <a href="http://www.crasphlan.com">Crashplan</a>.</p>
+  <entry>
+    <title type="html"><![CDATA[OAuth User Authentication for Flickr in Python]]></title>
+    <link href="http://kelsmj.github.com/2011/07/03/Flickr-oAuth-Python-Example/"/>
+    <updated>2011-07-03T14:30:00-04:00</updated>
+    <id>http://kelsmj.github.com/2011/07/03/Flickr-oAuth-Python-Example</id>
+    <content type="html"><![CDATA[<p>I always wanted to write an application that will use the Flickr API to pull all my photos from Flickr and store them locally, so I can further back them up via <a href="http://www.crasphlan.com">Crashplan</a>.</p>
 
 <p>I decided to write this app in python, a language which I have no professional experience in, and have only recently dabbled with.  I figured it would be a good learning experience.  We will see!</p>
 
@@ -973,122 +803,7 @@ After doing a lot of searching, I finally found a solution that works for me.</p
 <p>If all the requests succeeded you should have a token file in your directory with the <em>oauth_token</em> and the <em>oauth_token_secret</em>.  You can use these tokens to make subsequent requests to the Flickr API.  In my next post, I will illustrate how to do this.</p>
 
 <p>Feel free to email me with any questions or comments.  The git repo for this is located <a href="https://github.com/kelsmj/FlickrOAuth">here</a></p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
-<aside class="sidebar">
-  
-    <section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/">How I Setup VirtualEnv and VirtualEnvWrapper on my Mac</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2011/09/16/Mac-Apache-VirtualHosts-Symlinks/">Using Symlinks and Virtual hosts to serve pages outside of Sites directory using Apache on the MAC</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2011/07/09/Flickr-Api-Grab-Photos-Example/">Download Photos From Flickr Via API</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2011/07/03/Flickr-oAuth-Python-Example/">OAuth User Authentication for Flickr in Python</a>
-      </li>
-    
-  </ul>
-</section>
-
-<section>
-  <h1>GitHub Repos</h1>
-  <ul id="gh_repos">
-    <li class="loading">Status updating&#8230;</li>
-  </ul>
-  
-  <a href="https://github.com/kelsmj">@kelsmj</a> on GitHub
-  
-  <script type="text/javascript">
-    $(document).ready(function(){
-        if (!window.jXHR){
-            var jxhr = document.createElement('script');
-            jxhr.type = 'text/javascript';
-            jxhr.src = '/javascripts/libs/jXHR.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(jxhr, s);
-        }
-
-        github.showRepos({
-            user: 'kelsmj',
-            count: 0,
-            skip_forks: true,
-            target: '#gh_repos'
-        });
-    });
-  </script>
-  <script src="/javascripts/github.js" type="text/javascript"> </script>
-</section>
-
-
-
-
-
-  
-</aside>
-
-    </div>
-  </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - Matt Kelsey -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
-
-</footer>
-  
-
-<script type="text/javascript">
-      var disqus_shortname = 'mattkelseyblog';
-      
-        
-        var disqus_script = 'count.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
-
-
-
-
-
-
-
-  <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
-  </script>
-
-
-
-
-
-</body>
-</html>
+</feed>

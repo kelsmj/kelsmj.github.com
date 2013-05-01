@@ -1,0 +1,385 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Using Symlinks and Virtual hosts to serve pages outside of Sites directory using Apache on the MAC - Matt Kelsey</title>
+  <meta name="author" content="Matt Kelsey">
+
+  
+  <meta name="description" content="Step by step instructions to serve pages outside of the Sites directory on the MAC (Lion) using Symlinks and Virtual Hosts.">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://kelsmj.github.com/2011/09/16/Mac-Apache-VirtualHosts-Symlinks">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Matt Kelsey" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-24177797-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+  <meta name="google-site-verification" content="GUgyJAFmKA6KYKpjqo4O-O-YGmCLDUDE7FkXu07PMho" />
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Matt Kelsey</a></h1>
+  
+    <h2>Technical notes, thoughts and examples</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:kelsmj.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Using Symlinks and Virtual Hosts to Serve Pages Outside of Sites Directory Using Apache on the MAC</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-09-16T14:30:00-04:00" pubdate data-updated="true">Sep 16<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I like keeping all my code and websites in a single &#8220;Code&#8221; directory on my machine, but it isn&#8217;t straightforward, from what I can tell, to get Apache on the MAC
+to serve up pages anywhere outside of the default &#8220;Sites&#8221; directory that is created when you enable &#8220;Web Sharing&#8221; on the MAC.<br/>
+After doing a lot of searching, I finally found a solution that works for me.</p>
+
+<p>I doubt this is the only solution, or even the &#8220;proper&#8221; solution, but it seems to work.</p>
+
+<p>Below are all the steps I took in order to serve pages out of directories other then those in the &#8220;Sites&#8221; directory.  For these steps, I will assume there is an existing directory of &#8220;~/Code/MyWebSite&#8221; that has a simple &#8220;Hello World&#8221; index.html file in it.</p>
+
+<ul>
+<li><p>Enable Web Sharing on the MAC by going to System Prefrences &#8211;> Sharing &#8211;> Check Enable Web Sharing</p></li>
+<li><p>Edit your <i>username</i>.conf file located in /private/etc/apache2/users and add the &#8220;FollowSymLinks&#8221; directive</p></li>
+</ul>
+
+
+<figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Directory "/Users/yourUserName/Sites/">
+</span><span class='line'>        Options Indexes MultiViews FollowSymLinks
+</span><span class='line'>        AllowOverride None
+</span><span class='line'>        Order allow,deny
+</span><span class='line'>        Allow from all
+</span><span class='line'>    &lt;/Directory></span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Edit the /private/etc/apache2/httpd.conf file and make sure the line under &#8220;# Virtual hosts&#8221; is not commented out, like so:</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Include /private/etc/apache2/extra/httpd-vhosts.conf</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Edit the /private/etc/apache2/extra/httpd-vhosts.conf file and add:</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;VirtualHost *:80>  
+</span><span class='line'>        &lt;Directory /Users/yourUserName/Sites/MyWebSite.com>
+</span><span class='line'>            Options +FollowSymlinks +SymLinksIfOwnerMatch
+</span><span class='line'>            AllowOverride All
+</span><span class='line'>        &lt;/Directory>
+</span><span class='line'>      DocumentRoot /Users/yourUserName/Sites/MyWebSite
+</span><span class='line'>      ServerName MyWebSite.local
+</span><span class='line'>    &lt;/VirtualHost></span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Edit the /etc/hosts file and add this at the top:</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>127.0.0.1 MyWebSite.local</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Make a Symlink to link your Code directory to one in the Sites directory.</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ln -s ~/Code/MyWebSite ~/Sites/MyWebSite</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Run apachectl to check config file syntax.</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apachectl -t</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Restart Apache</li>
+</ul>
+
+
+<figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apachectl restart</span></code></pre></td></tr></table></div></figure>
+
+
+<ul>
+<li>Open a browser and go to MyWebSite.local and you should see the results.</li>
+</ul>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Matt Kelsey</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-09-16T14:30:00-04:00" pubdate data-updated="true">Sep 16<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/apache/'>apache</a>, <a class='category' href='/blog/categories/mac/'>mac</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://kelsmj.github.com/2011/09/16/Mac-Apache-VirtualHosts-Symlinks/" data-via="kelsmj" data-counturl="http://kelsmj.github.com/2011/09/16/Mac-Apache-VirtualHosts-Symlinks/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/2011/07/09/Flickr-Api-Grab-Photos-Example/" title="Previous Post: Download Photos From Flickr Via API">&laquo; Download Photos From Flickr Via API</a>
+      
+      
+        <a class="basic-alignment right" href="/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/" title="Next Post: How I Setup VirtualEnv and VirtualEnvWrapper on my Mac">How I Setup VirtualEnv and VirtualEnvWrapper on my Mac &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/">How I Setup VirtualEnv and VirtualEnvWrapper on my Mac</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2011/09/16/Mac-Apache-VirtualHosts-Symlinks/">Using Symlinks and Virtual hosts to serve pages outside of Sites directory using Apache on the MAC</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2011/07/09/Flickr-Api-Grab-Photos-Example/">Download Photos From Flickr Via API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2011/07/03/Flickr-oAuth-Python-Example/">OAuth User Authentication for Flickr in Python</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/kelsmj">@kelsmj</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'kelsmj',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Matt Kelsey -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mattkelseyblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://kelsmj.github.com/2011/09/16/Mac-Apache-VirtualHosts-Symlinks/';
+        var disqus_url = 'http://kelsmj.github.com/2011/09/16/Mac-Apache-VirtualHosts-Symlinks/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

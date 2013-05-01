@@ -1,0 +1,519 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>OAuth User Authentication for Flickr in Python - Matt Kelsey</title>
+  <meta name="author" content="Matt Kelsey">
+
+  
+  <meta name="description" content="Example Python code that shows you how to authenticate using the OAuth authentication scheme for Flickr.">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://kelsmj.github.com/2011/07/03/Flickr-oAuth-Python-Example">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Matt Kelsey" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-24177797-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+  <meta name="google-site-verification" content="GUgyJAFmKA6KYKpjqo4O-O-YGmCLDUDE7FkXu07PMho" />
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Matt Kelsey</a></h1>
+  
+    <h2>Technical notes, thoughts and examples</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:kelsmj.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">OAuth User Authentication for Flickr in Python</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-07-03T14:30:00-04:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I always wanted to write an application that will use the Flickr API to pull all my photos from Flickr and store them locally, so I can further back them up via <a href="http://www.crasphlan.com">Crashplan</a>.</p>
+
+<p>I decided to write this app in python, a language which I have no professional experience in, and have only recently dabbled with.  I figured it would be a good learning experience.  We will see!</p>
+
+<p>The first thing that needs to be accomplished, in order to make calls to the Flickr API, is authenticate a user.  Flickr just recently added support for using OAuth to authenticate a user <a href="http://www.flickr.com/services/api/auth.oauth.html">Using OAuth with Flickr</a> and they will be removing their old authentication API in the future.  The focus of this post will outline the steps I took in order to successfully use OAuth to authenticate against my application.</p>
+
+<p>The code below has two prerequisites in order to work correctly:</p>
+
+<ol>
+<li>A text file called &#8220;apikeys&#8221; in the root directory containing the api_key (consumer_key) and secret for your application.  You get the key and secret by creating a new Flickr Application associated with your account.  Go to &#8220;The App Garden&#8221;:http://www.flickr.com/services/apps/create/apply/ to apply for one.  Each entry in this file needs to be on its own line with the api_key coming first.</li>
+<li>Downloading and installing &#8220;python-oauth2&#8221;:https://github.com/simplegeo/python-oauth2</li>
+</ol>
+
+
+<p>To setup python-oauth2:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>~/$ git clone https://github.com/simplegeo/python-oauth2.git
+</span><span class='line'>~/$ ./setup.py install</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The first thing to understand about using OAuth with Flickr, is every request must be signed using the HMAC-SHA1 signature encryption.  You do this by building a Request object via the python-oauth2 Request method, passing in the url you want to make the request to and the parameters you want to send.  You then call the SignatureMethod_HMAC_SHA1().sign method and add the resulting signature to the Request.</p>
+
+<p>The begin the authentication procedure, you first need to create a request that will get a request token.  The request will be made to http://www.flickr.com/services/oauth/request_token with the following paramaters:
+* oauth_timestamp
+* oauth_signature_method
+* oauth_version
+* oauth_callback
+* oauth_nonce
+* oauth_consumer_key
+* oauth_signature</p>
+
+<p>The code to perform this operation:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'>           
+</span><span class='line'><span class="n">url</span> <span class="o">=</span> <span class="s">&quot;http://www.flickr.com/services/oauth/request_token&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Set the base oauth_* parameters along with any other parameters required</span>
+</span><span class='line'><span class="c"># for the API call.</span>
+</span><span class='line'><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="s">&#39;oauth_timestamp&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())),</span>
+</span><span class='line'>  <span class="s">&#39;oauth_signature_method&#39;</span><span class="p">:</span><span class="s">&quot;HMAC-SHA1&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s">&#39;oauth_version&#39;</span><span class="p">:</span> <span class="s">&quot;1.0&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s">&#39;oauth_callback&#39;</span><span class="p">:</span> <span class="s">&quot;http://www.mkelsey.com&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s">&#39;oauth_nonce&#39;</span><span class="p">:</span> <span class="n">oauth</span><span class="o">.</span><span class="n">generate_nonce</span><span class="p">(),</span>
+</span><span class='line'>  <span class="s">&#39;oauth_consumer_key&#39;</span><span class="p">:</span> <span class="n">keys</span><span class="o">.</span><span class="n">apikey</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Setup the Consumer with the api_keys given by the provider</span>
+</span><span class='line'><span class="n">consumer</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Consumer</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">keys</span><span class="o">.</span><span class="n">apikey</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="n">keys</span><span class="o">.</span><span class="n">apisecret</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Create our request. Change method, etc. accordingly.</span>
+</span><span class='line'><span class="n">req</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Create the signature</span>
+</span><span class='line'><span class="n">signature</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">SignatureMethod_HMAC_SHA1</span><span class="p">()</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="n">consumer</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Add the Signature to the request</span>
+</span><span class='line'><span class="n">req</span><span class="p">[</span><span class="s">&#39;oauth_signature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">signature</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Make the request to get the oauth_token and the oauth_token_secret</span>
+</span><span class='line'><span class="c"># I had to directly use the httplib2 here, instead of the oauth library.</span>
+</span><span class='line'><span class="n">h</span> <span class="o">=</span> <span class="n">httplib2</span><span class="o">.</span><span class="n">Http</span><span class="p">(</span><span class="s">&quot;.cache&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="n">resp</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">to_url</span><span class="p">(),</span> <span class="s">&quot;GET&quot;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If all is successful, Flickr include a <em>oauth_token</em> and a <em>oauth_token_secret</em> in the Response.  You can now store those tokens off and prompt a user to go authorize your application.  They will need to go to http://www.flickr.com/services/oauth/authorize with the <em>oauth_token</em> appended as a querystring parameter along with the perms parameter indicating if your application will need read,write and delete privileges.  Once the user authorizes your application, Flickr will redirect to the <em>oauth_callback</em> url specified above with a <em>oauth_verifier</em> querystring parameter that you can then use in the third and final step of oAuth authentication.</p>
+
+<p>The code to perform this operation:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">authorize_url</span> <span class="o">=</span> <span class="s">&quot;http://www.flickr.com/services/oauth/authorize&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#parse the content</span>
+</span><span class='line'><span class="n">request_token</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">urlparse</span><span class="o">.</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span> <span class="s">&quot;Request Token:&quot;</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&quot;    - oauth_token        = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">]</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&quot;    - oauth_token_secret = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token_secret&#39;</span><span class="p">]</span>
+</span><span class='line'><span class="k">print</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Create the token object with returned oauth_token and oauth_token_secret</span>
+</span><span class='line'><span class="n">token</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Token</span><span class="p">(</span><span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">],</span>
+</span><span class='line'>  <span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token_secret&#39;</span><span class="p">])</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># You need to authorize this app via your browser.</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&quot;Go to the following link in your browser:&quot;</span>
+</span><span class='line'><span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">?oauth_token=</span><span class="si">%s</span><span class="s">&amp;perms=read&quot;</span> <span class="o">%</span>
+</span><span class='line'>  <span class="p">(</span><span class="n">authorize_url</span><span class="p">,</span> <span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">])</span>
+</span><span class='line'><span class="k">print</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Once you get the verified pin, input it</span>
+</span><span class='line'><span class="n">accepted</span> <span class="o">=</span> <span class="s">&#39;n&#39;</span>
+</span><span class='line'><span class="k">while</span> <span class="n">accepted</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;n&#39;</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">accepted</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&#39;Have you authorized me? (y/n) &#39;</span><span class="p">)</span>
+</span><span class='line'><span class="n">oauth_verifier</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&#39;What is the PIN? &#39;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#set the oauth_verifier token</span>
+</span><span class='line'><span class="n">token</span><span class="o">.</span><span class="n">set_verifier</span><span class="p">(</span><span class="n">oauth_verifier</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The third and final step in authenticating is exchanging the Request Token for an Access Token.  The Access Token is something you will store off for that user and you will be able to make Flickr API calls using the Access Token.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># url to get access token</span>
+</span><span class='line'><span class="n">access_token_url</span> <span class="o">=</span> <span class="s">&quot;http://www.flickr.com/services/oauth/access_token&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Now you need to exchange your Request Token for an Access Token</span>
+</span><span class='line'><span class="c"># Set the base oauth_* parameters along with any other parameters required</span>
+</span><span class='line'><span class="c"># for the API call.</span>
+</span><span class='line'><span class="n">access_token_parms</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="s">&#39;oauth_consumer_key&#39;</span><span class="p">:</span> <span class="n">keys</span><span class="o">.</span><span class="n">apikey</span><span class="p">,</span>
+</span><span class='line'>  <span class="s">&#39;oauth_nonce&#39;</span><span class="p">:</span> <span class="n">oauth</span><span class="o">.</span><span class="n">generate_nonce</span><span class="p">(),</span>
+</span><span class='line'>  <span class="s">&#39;oauth_signature_method&#39;</span><span class="p">:</span><span class="s">&quot;HMAC-SHA1&quot;</span><span class="p">,</span>
+</span><span class='line'>  <span class="s">&#39;oauth_timestamp&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())),</span>
+</span><span class='line'>  <span class="s">&#39;oauth_token&#39;</span><span class="p">:</span><span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">],</span>
+</span><span class='line'>  <span class="s">&#39;oauth_verifier&#39;</span> <span class="p">:</span> <span class="n">oauth_verifier</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#setup request</span>
+</span><span class='line'><span class="n">req</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">access_token_url</span><span class="p">,</span>
+</span><span class='line'>  <span class="n">parameters</span><span class="o">=</span><span class="n">access_token_parms</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#create the signature</span>
+</span><span class='line'><span class="n">signature</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">SignatureMethod_HMAC_SHA1</span><span class="p">()</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="n">consumer</span><span class="p">,</span><span class="n">token</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># assign the signature to the request</span>
+</span><span class='line'><span class="n">req</span><span class="p">[</span><span class="s">&#39;oauth_signature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">signature</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#make the request</span>
+</span><span class='line'><span class="n">h</span> <span class="o">=</span> <span class="n">httplib2</span><span class="o">.</span><span class="n">Http</span><span class="p">(</span><span class="s">&quot;.cache&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="n">resp</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">to_url</span><span class="p">(),</span> <span class="s">&quot;GET&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#parse the response</span>
+</span><span class='line'><span class="n">access_token_resp</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">urlparse</span><span class="o">.</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#write out a file with the oauth_token and oauth_token_secret</span>
+</span><span class='line'><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;token&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span class='line'>  <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">access_token_resp</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+</span><span class='line'>  <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">access_token_resp</span><span class="p">[</span><span class="s">&#39;oauth_token_secret&#39;</span><span class="p">])</span>
+</span><span class='line'><span class="n">f</span><span class="o">.</span><span class="n">closed</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If all the requests succeeded you should have a token file in your directory with the <em>oauth_token</em> and the <em>oauth_token_secret</em>.  You can use these tokens to make subsequent requests to the Flickr API.  In my next post, I will illustrate how to do this.</p>
+
+<p>Feel free to email me with any questions or comments.  The git repo for this is located <a href="https://github.com/kelsmj/FlickrOAuth">here</a></p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Matt Kelsey</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-07-03T14:30:00-04:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/flickr/'>flickr</a>, <a class='category' href='/blog/categories/oauth/'>oauth</a>, <a class='category' href='/blog/categories/python/'>python</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://kelsmj.github.com/2011/07/03/Flickr-oAuth-Python-Example/" data-via="kelsmj" data-counturl="http://kelsmj.github.com/2011/07/03/Flickr-oAuth-Python-Example/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+      
+        <a class="basic-alignment right" href="/2011/07/09/Flickr-Api-Grab-Photos-Example/" title="Next Post: Download Photos From Flickr Via API">Download Photos From Flickr Via API &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/">How I Setup VirtualEnv and VirtualEnvWrapper on my Mac</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2011/09/16/Mac-Apache-VirtualHosts-Symlinks/">Using Symlinks and Virtual hosts to serve pages outside of Sites directory using Apache on the MAC</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2011/07/09/Flickr-Api-Grab-Photos-Example/">Download Photos From Flickr Via API</a>
+      </li>
+    
+      <li class="post">
+        <a href="/2011/07/03/Flickr-oAuth-Python-Example/">OAuth User Authentication for Flickr in Python</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/kelsmj">@kelsmj</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'kelsmj',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Matt Kelsey -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'mattkelseyblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://kelsmj.github.com/2011/07/03/Flickr-oAuth-Python-Example/';
+        var disqus_url = 'http://kelsmj.github.com/2011/07/03/Flickr-oAuth-Python-Example/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

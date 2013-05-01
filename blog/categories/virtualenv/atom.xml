@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: virtualenv | Matt Kelsey]]></title>
+  <link href="http://kelsmj.github.com/blog/categories/virtualenv/atom.xml" rel="self"/>
+  <link href="http://kelsmj.github.com/"/>
+  <updated>2013-05-01T06:29:50-04:00</updated>
+  <id>http://kelsmj.github.com/</id>
+  <author>
+    <name><![CDATA[Matt Kelsey]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[How I Setup VirtualEnv and VirtualEnvWrapper on my Mac]]></title>
+    <link href="http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/"/>
+    <updated>2013-04-30T14:23:00-04:00</updated>
+    <id>http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac</id>
+    <content type="html"><![CDATA[<p>The following are the steps I take to setup up <a href="http://www.virtualenv.org/en/latest/">VirtualEnv</a> and <a href="http://virtualenvwrapper.readthedocs.org/en/latest/">VirtualEnvWrapper</a> on a new machine.</p>
+
+<ul>
+<li><p>Make sure pip is installed by running pip in the terminal.</p></li>
+<li><p>If it isn't installed, install by doing</p></li>
+</ul>
+
+
+<p><code>   
+sudo easy_install pip
+</code></p>
+
+<ul>
+<li>Next, install virtualenv and virtualenvwrapper</li>
+</ul>
+
+
+<p><code>
+sudo pip install virtualenvwrapper
+</code></p>
+
+<p><code>
+sudo pip install virtualenvwrapper
+</code></p>
+
+<ul>
+<li><p>Open up your .bash_profile or .profile, and after your PATH statement, add the following</p>
+
+<p>  <div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>  <span class="c"># set where virutal environments will live</span>
+</span><span class='line'>  <span class="nb">export </span><span class="nv">WORKON_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/.virtualenvs
+</span><span class='line'>  <span class="c"># ensure all new environments are isolated from the site-packages directory</span>
+</span><span class='line'>  <span class="nb">export </span><span class="nv">VIRTUALENVWRAPPER_VIRTUALENV_ARGS</span><span class="o">=</span><span class="s1">&#39;--no-site-packages&#39;</span>
+</span><span class='line'>  <span class="c"># use the same directory for virtualenvs as virtualenvwrapper</span>
+</span><span class='line'>  <span class="nb">export </span><span class="nv">PIP_VIRTUALENV_BASE</span><span class="o">=</span><span class="nv">$WORKON_HOME</span>
+</span><span class='line'>  <span class="c"># makes pip detect an active virtualenv and install to it</span>
+</span><span class='line'>  <span class="nb">export </span><span class="nv">PIP_RESPECT_VIRTUALENV</span><span class="o">=</span><span class="nb">true</span>
+</span><span class='line'><span class="nb">  </span><span class="k">if</span> <span class="o">[[</span> -r /usr/local/bin/virtualenvwrapper.sh <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;  <span class="nb">source</span> /usr/local/bin/virtualenvwrapper.sh
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'>
+</span><span class='line'>&lt;pre&gt;&lt;code&gt;  <span class="nb">echo</span> <span class="s2">&quot;WARNING: Can&#39;t find virtualenvwrapper.sh&quot;</span>
+</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;  <span class="k">fi</span>
+</span><span class='line'>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
+<li><p>Open a new terminal window.  You should see virtualenvwrapper.sh being run and setting up your .virtualenvs directory.</p></li>
+<li><p>Test creating a new virtualenv</p></li>
+</ul>
+
+
+<p><code>
+$ mkvirtualenv testenv
+</code></p>
+
+<ul>
+<li>You should see something in the console like</li>
+</ul>
+
+
+<p><code>
+New python executable in testenv/bin/python
+Installing setuptools............done.
+Installing pip...............done.
+virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/predeactivate
+virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/postdeactivate
+virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/preactivate
+virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/postactivate
+virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/get_env_details
+</code></p>
+
+<ul>
+<li><p>That should put you into a new virtualenv called "testenv"</p></li>
+<li><p>Lets install some packages and create a requirements.txt file</p></li>
+</ul>
+
+
+<p><code>
+$ pip install rq
+$ pip install requests
+$ pip install google-api-python-client
+$ pip freeze &gt; requirements.txt
+</code></p>
+
+<ul>
+<li><p>Your have just installed 3 python packages into your virtual environment, and created a .txt file that will have all the necessary information in order to reproduce your environment.</p></li>
+<li><p>You can leave your virtualenv by doing</p></li>
+</ul>
+
+
+<p><code>
+deactivate testenv
+</code></p>
+
+<ul>
+<li>To create a new virtualenv, and install the libraries based on the requirements.txt file you just created, just do the following.</li>
+</ul>
+
+
+<p><code>
+mkvirtualenv testenv2
+pip install -r requirements.txt
+</code></p>
+
+<ul>
+<li>List of commonly used commands
+
+<ul>
+<li>mkvirtualenv (create a new virtualenv)</li>
+<li>rmvirtualenv (remove an existing virtualenv)</li>
+<li>workon (change the current virtualenv)</li>
+<li>add2virtualenv (add external packages in a .pth file to current virtualenv)</li>
+<li>cdsitepackages (cd into the site-packages directory of current virtualenv)</li>
+<li>cdvirtualenv (cd into the root of the current virtualenv)</li>
+<li>deactivate (deactivate virtualenv, which calls several hooks)</li>
+</ul>
+</li>
+</ul>
+
+]]></content>
+  </entry>
+  
+</feed>
