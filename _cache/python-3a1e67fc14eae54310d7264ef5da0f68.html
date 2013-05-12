@@ -1,0 +1,13 @@
+<div class="highlight"><pre><span class="k">print</span> <span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">Please</span> <span class="n">enter</span> <span class="n">a</span> <span class="n">photo</span> <span class="nb">id</span><span class="p">:</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;,</span>
+<span class="n">photoId</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">()</span>
+<span class="k">print</span> <span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">Fetching</span> <span class="n">Photo</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">photoSizes</span> <span class="o">=</span> <span class="n">FlickrPhotosGetSizes</span><span class="p">(</span><span class="n">photo_id</span> <span class="o">=</span> <span class="n">photoId</span><span class="p">)</span>
+<span class="k">if</span><span class="p">(</span><span class="n">photoSizes</span><span class="o">.</span><span class="n">makeCall</span><span class="p">()):</span>
+    <span class="k">print</span> <span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">API</span> <span class="n">Call</span> <span class="n">Success</span><span class="err">!</span> <span class="n">Writing</span> <span class="n">Photos</span> <span class="n">to</span> <span class="n">Disk</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span>
+    <span class="n">photoSizes</span><span class="o">.</span><span class="n">writePhotos</span><span class="p">()</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span> <span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">API</span> <span class="n">Call</span> <span class="n">Failed</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</pre></div>

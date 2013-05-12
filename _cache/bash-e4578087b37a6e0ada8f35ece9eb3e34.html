@@ -1,0 +1,23 @@
+<div class="highlight"><pre>&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;toc_166&quot;</span>&gt;set where virutal environments will live&lt;/h1&gt;
+
+&lt;p&gt;export <span class="nv">WORKON_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/.virtualenvs&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;toc_167&quot;</span>&gt;ensure all new environments are isolated from the site-packages directory&lt;/h1&gt;
+
+&lt;p&gt;export <span class="nv">VIRTUALENVWRAPPER_VIRTUALENV_ARGS</span><span class="o">=</span>&amp;#39;--no-site-packages&amp;#39;&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;toc_168&quot;</span>&gt;use the same directory <span class="k">for </span>virtualenvs as virtualenvwrapper&lt;/h1&gt;
+
+&lt;p&gt;export <span class="nv">PIP_VIRTUALENV_BASE</span><span class="o">=</span><span class="nv">$WORKON_HOME</span>&lt;/p&gt;
+
+&lt;h1 <span class="nv">id</span><span class="o">=</span><span class="s2">&quot;toc_169&quot;</span>&gt;makes pip detect an active virtualenv and install to it&lt;/h1&gt;
+
+&lt;p&gt;export <span class="nv">PIP_RESPECT_VIRTUALENV</span><span class="o">=</span><span class="nb">true</span>
+<span class="k">if</span> <span class="o">[[</span> -r /usr/local/bin/virtualenvwrapper.sh <span class="o">]]</span>; <span class="k">then</span>
+<span class="k">    </span><span class="nb">source</span> /usr/local/bin/virtualenvwrapper.sh
+<span class="k">else</span>
+<span class="k">    </span><span class="nb">echo</span> &amp;quot;WARNING: Can&amp;#39;t find virtualenvwrapper.sh&amp;quot;
+<span class="k">fi</span>
+</pre></div>

@@ -1,0 +1,12 @@
+<div class="highlight"><pre><span class="k">print</span> <span class="s">&quot;Please enter a photo id:&quot;</span><span class="p">,</span>
+<span class="n">photoId</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&quot;Fetching Photo&quot;</span>
+
+<span class="n">photoSizes</span> <span class="o">=</span> <span class="n">FlickrPhotosGetSizes</span><span class="p">(</span><span class="n">photo_id</span> <span class="o">=</span> <span class="n">photoId</span><span class="p">)</span>
+<span class="k">if</span><span class="p">(</span><span class="n">photoSizes</span><span class="o">.</span><span class="n">makeCall</span><span class="p">()):</span>
+	<span class="k">print</span> <span class="s">&quot;API Call Success! Writing Photos to Disk&quot;</span>
+	<span class="n">photoSizes</span><span class="o">.</span><span class="n">writePhotos</span><span class="p">()</span>
+<span class="k">else</span><span class="p">:</span>
+	<span class="k">print</span> <span class="s">&quot;API Call Failed&quot;</span>
+	
+</pre></div>

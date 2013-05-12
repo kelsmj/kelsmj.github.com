@@ -1,2 +1,15 @@
 // This File is imported last, and will override other styles in the cascade
 // Add styles here to make changes without digging in too much
+  dt {
+    font-weight: bold;
+    text-decoration: underline;
+  }
+  dd {
+    margin: 0 0 0 0.5em;
+    padding: 0 0 0.5em 0;
+  }
+
+ul, ol
+{
+  margin-left: 1.3em;
+}

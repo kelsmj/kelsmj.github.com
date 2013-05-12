@@ -1,0 +1,30 @@
+<div class="highlight"><pre><span class="n">url</span> <span class="o">=</span> <span class="s">&quot;http://www.flickr.com/services/oauth/request_token&quot;</span>
+
+<span class="c"># Set the base oauth_* parameters along with any other parameters required</span>
+<span class="c"># for the API call.</span>
+<span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="s">&#39;oauth_timestamp&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())),</span>
+	<span class="s">&#39;oauth_signature_method&#39;</span><span class="p">:</span><span class="s">&quot;HMAC-SHA1&quot;</span><span class="p">,</span>
+	<span class="s">&#39;oauth_version&#39;</span><span class="p">:</span> <span class="s">&quot;1.0&quot;</span><span class="p">,</span>
+	<span class="s">&#39;oauth_callback&#39;</span><span class="p">:</span> <span class="s">&quot;http://www.mkelsey.com&quot;</span><span class="p">,</span>
+	<span class="s">&#39;oauth_nonce&#39;</span><span class="p">:</span> <span class="n">oauth</span><span class="o">.</span><span class="n">generate_nonce</span><span class="p">(),</span>
+	<span class="s">&#39;oauth_consumer_key&#39;</span><span class="p">:</span> <span class="n">keys</span><span class="o">.</span><span class="n">apikey</span>
+<span class="p">}</span>
+
+<span class="c"># Setup the Consumer with the api_keys given by the provider</span>
+<span class="n">consumer</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Consumer</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">keys</span><span class="o">.</span><span class="n">apikey</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="n">keys</span><span class="o">.</span><span class="n">apisecret</span><span class="p">)</span>
+
+<span class="c"># Create our request. Change method, etc. accordingly.</span>
+<span class="n">req</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+
+<span class="c"># Create the signature</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">SignatureMethod_HMAC_SHA1</span><span class="p">()</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="n">consumer</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+
+<span class="c"># Add the Signature to the request</span>
+<span class="n">req</span><span class="p">[</span><span class="s">&#39;oauth_signature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">signature</span>
+
+<span class="c"># Make the request to get the oauth_token and the oauth_token_secret</span>
+<span class="c"># I had to directly use the httplib2 here, instead of the oauth library.</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">httplib2</span><span class="o">.</span><span class="n">Http</span><span class="p">(</span><span class="s">&quot;.cache&quot;</span><span class="p">)</span>
+<span class="n">resp</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">to_url</span><span class="p">(),</span> <span class="s">&quot;GET&quot;</span><span class="p">)</span>
+</pre></div>

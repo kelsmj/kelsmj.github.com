@@ -1,0 +1,52 @@
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">FlickrApiMethod</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">Base</span> <span class="k">class</span> <span class="nc">for</span> <span class="n">Flickr</span> <span class="n">API</span> <span class="n">calls</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">div</span> <span class="n">class</span><span class="o">=</span><span class="s">&quot;highlight&quot;</span><span class="o">&gt;&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span> <span class="n">class</span><span class="o">=</span><span class="s">&quot;text&quot;</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nojsoncallback</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">format</span><span class="o">=&amp;</span><span class="c">#39;json&amp;#39;,parameters=None):</span>
+    <span class="n">apifile</span> <span class="o">=</span> <span class="n">APIKeys</span><span class="p">()</span>
+    <span class="n">tokenfile</span> <span class="o">=</span> <span class="n">TokenKeys</span><span class="p">()</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">consumer</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Consumer</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">apifile</span><span class="o">.</span><span class="n">apikey</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="n">apifile</span><span class="o">.</span><span class="n">apisecret</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Token</span><span class="p">(</span><span class="n">tokenfile</span><span class="o">.</span><span class="n">token</span><span class="p">,</span> <span class="n">tokenfile</span><span class="o">.</span><span class="n">secret</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">nojsoncallback</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nojsoncallback</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nojsoncallback</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">parameters</span><span class="p">:</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">api</span><span class="o">.</span><span class="n">flickr</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">rest</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span>
+
+    <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="o">&amp;</span><span class="c">#39;format&amp;#39;:format,</span>
+        <span class="o">&amp;</span><span class="c">#39;nojsoncallback&amp;#39;:self.nojsoncallback,</span>
+        <span class="o">&amp;</span><span class="c">#39;oauth_timestamp&amp;#39;: str(int(time.time())),</span>
+        <span class="o">&amp;</span><span class="c">#39;oauth_nonce&amp;#39;: oauth.generate_nonce(),</span>
+        <span class="o">&amp;</span><span class="c">#39;signature_method&amp;#39;: &amp;quot;HMAC-SHA1&amp;quot;,</span>
+        <span class="o">&amp;</span><span class="c">#39;oauth_token&amp;#39;:self.token.key,</span>
+        <span class="o">&amp;</span><span class="c">#39;oauth_consumer_key&amp;#39;:self.consumer.key,</span>
+    <span class="p">}</span>
+
+    <span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">defaults</span>
+
+<span class="k">def</span> <span class="nf">makeCall</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getParameters</span><span class="p">())</span>
+    <span class="n">req</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">method</span><span class="o">=&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">GET</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;,</span> <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span>
+    <span class="n">req</span><span class="p">[</span><span class="o">&amp;</span><span class="c">#39;oauth_signature&amp;#39;] = oauth.SignatureMethod_HMAC_SHA1().sign(req,self.consumer,self.token)</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">httplib2</span><span class="o">.</span><span class="n">Http</span><span class="p">(</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="o">.</span><span class="n">cache</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;)</span>
+    <span class="n">resp</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">to_url</span><span class="p">(),</span> <span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">GET</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">content</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">stat</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;]</span> <span class="o">==</span> <span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">ok</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+<span class="k">def</span> <span class="nf">getParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+<span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">div</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</pre></div>

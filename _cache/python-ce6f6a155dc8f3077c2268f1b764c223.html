@@ -1,0 +1,44 @@
+<div class="highlight"><pre><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+
+  <span class="c">#Read the Config File to get the twitter keys and tokens</span>
+  <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="o">.</span><span class="n">RawConfigParser</span><span class="p">()</span>
+  <span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s">&#39;settings.cfg&#39;</span><span class="p">)</span>
+
+  <span class="c">#method, url and parameters to call</span>
+  <span class="n">method</span> <span class="o">=</span> <span class="s">&quot;get&quot;</span>
+  <span class="n">url</span> <span class="o">=</span> <span class="s">&quot;https://api.twitter.com/1.1/statuses/user_timeline.json&quot;</span>
+  <span class="n">url_parameters</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s">&#39;exclude_replies&#39;</span><span class="p">:</span> <span class="s">&#39;true&#39;</span>
+  <span class="p">}</span>
+
+  <span class="c">#configuration hash for the keys</span>
+  <span class="n">keys</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s">&quot;twitter_consumer_secret&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+          <span class="s">&#39;Keys&#39;</span><span class="p">,</span> <span class="s">&#39;twitter_consumer_secret&#39;</span><span class="p">),</span>
+      <span class="s">&quot;twitter_consumer_key&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;Keys&#39;</span><span class="p">,</span> <span class="s">&#39;twitter_consumer_key&#39;</span><span class="p">),</span>
+      <span class="s">&quot;access_token&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;Keys&#39;</span><span class="p">,</span> <span class="s">&#39;access_token&#39;</span><span class="p">),</span>
+      <span class="s">&quot;access_token_secret&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;Keys&#39;</span><span class="p">,</span> <span class="s">&#39;access_token_secret&#39;</span><span class="p">)</span>
+  <span class="p">}</span>
+
+  <span class="n">oauth_parameters</span> <span class="o">=</span> <span class="n">get_oauth_parameters</span><span class="p">(</span>
+      <span class="n">keys</span><span class="p">[</span><span class="s">&#39;twitter_consumer_key&#39;</span><span class="p">],</span>
+      <span class="n">keys</span><span class="p">[</span><span class="s">&#39;access_token&#39;</span><span class="p">]</span>
+  <span class="p">)</span>
+
+  <span class="n">oauth_parameters</span><span class="p">[</span><span class="s">&#39;oauth_signature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generate_signature</span><span class="p">(</span>
+      <span class="n">method</span><span class="p">,</span>
+      <span class="n">url</span><span class="p">,</span>
+      <span class="n">url_parameters</span><span class="p">,</span> <span class="n">oauth_parameters</span><span class="p">,</span>
+      <span class="n">keys</span><span class="p">[</span><span class="s">&#39;twitter_consumer_key&#39;</span><span class="p">],</span>
+      <span class="n">keys</span><span class="p">[</span><span class="s">&#39;twitter_consumer_secret&#39;</span><span class="p">],</span>
+      <span class="n">keys</span><span class="p">[</span><span class="s">&#39;access_token_secret&#39;</span><span class="p">]</span>
+  <span class="p">)</span>
+
+  <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;Authorization&#39;</span><span class="p">:</span> <span class="n">create_auth_header</span><span class="p">(</span><span class="n">oauth_parameters</span><span class="p">)}</span>
+
+  <span class="n">url</span> <span class="o">+=</span> <span class="s">&#39;?&#39;</span> <span class="o">+</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">(</span><span class="n">url_parameters</span><span class="p">)</span>
+
+  <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+
+  <span class="k">print</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">),</span> <span class="n">sort_keys</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</pre></div>

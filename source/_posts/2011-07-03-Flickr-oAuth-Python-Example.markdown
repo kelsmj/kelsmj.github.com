@@ -38,7 +38,7 @@ The begin the authentication procedure, you first need to create a request that 
 
 The code to perform this operation:
 
-{% codeblock lang:python %}			
+{% codeblock lang:python %}
 url = "http://www.flickr.com/services/oauth/request_token"
 
 # Set the base oauth_* parameters along with any other parameters required
@@ -70,7 +70,7 @@ h = httplib2.Http(".cache")
 resp, content = h.request(req.to_url(), "GET")
 {% endcodeblock %}
 
-If all is successful, Flickr include a _oauth_token_ and a _oauth_token_secret_ in the Response.  You can now store those tokens off and prompt a user to go authorize your application.  They will need to go to http://www.flickr.com/services/oauth/authorize with the _oauth_token_ appended as a querystring parameter along with the perms parameter indicating if your application will need read,write and delete privileges.  Once the user authorizes your application, Flickr will redirect to the _oauth_callback_ url specified above with a _oauth_verifier_ querystring parameter that you can then use in the third and final step of oAuth authentication.  
+If all is successful, Flickr include a _oauth_token_ and a _oauth_token_secret_ in the Response.  You can now store those tokens off and prompt a user to go authorize your application.  They will need to go to http://www.flickr.com/services/oauth/authorize with the _oauth_token_ appended as a querystring parameter along with the perms parameter indicating if your application will need read,write and delete privileges.  Once the user authorizes your application, Flickr will redirect to the _oauth_callback_ url specified above with a _oauth_verifier_ querystring parameter that you can then use in the third and final step of oAuth authentication.
 
 The code to perform this operation:
 
@@ -86,12 +86,12 @@ print "    - oauth_token_secret = %s" % request_token['oauth_token_secret']
 print
 
 # Create the token object with returned oauth_token and oauth_token_secret
-token = oauth.Token(request_token['oauth_token'], 
+token = oauth.Token(request_token['oauth_token'],
 	request_token['oauth_token_secret'])
 
 # You need to authorize this app via your browser.
 print "Go to the following link in your browser:"
-print "%s?oauth_token=%s&perms=read" % 
+print "%s?oauth_token=%s&perms=read" %
 	(authorize_url, request_token['oauth_token'])
 print
 
@@ -124,7 +124,7 @@ access_token_parms = {
 }
 
 #setup request
-req = oauth.Request(method="GET", url=access_token_url, 
+req = oauth.Request(method="GET", url=access_token_url,
 	parameters=access_token_parms)
 
 #create the signature

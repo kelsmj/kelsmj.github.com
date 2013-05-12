@@ -1,0 +1,15 @@
+<div class="highlight"><pre><code class="text">def __init__(self,filename=&#39;apikeys&#39;):
+    try:
+        fp = open(filename)
+    except IOError as e:
+        if e.errno == errno.EACCESS:
+            print &quot;file does not exists&quot;
+        # Not a permission error.
+        raise
+    else:
+        with fp:
+        self.apikey = fp.readline().rstrip(&#39;\n&#39;)
+        self.apisecret = fp.readline()
+        fp.close()
+</code></pre>
+</div>

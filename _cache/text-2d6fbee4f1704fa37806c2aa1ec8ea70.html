@@ -1,0 +1,47 @@
+<div class="highlight"><pre><code class="text">def __init__(self,nojsoncallback=True,format=&#39;json&#39;,parameters=None):
+    apifile = APIKeys()
+    tokenfile = TokenKeys()
+
+    self.consumer = oauth.Consumer(key=apifile.apikey, secret=apifile.apisecret)
+    self.token = oauth.Token(tokenfile.token, tokenfile.secret)
+
+    if nojsoncallback:
+        self.nojsoncallback = 1
+    else:
+        self.nojsoncallback = 0
+    if not parameters:
+        parameters = {}
+
+    self.url = &quot;http://api.flickr.com/services/rest&quot;
+
+    defaults = {
+        &#39;format&#39;:format,
+        &#39;nojsoncallback&#39;:self.nojsoncallback,
+        &#39;oauth_timestamp&#39;: str(int(time.time())),
+        &#39;oauth_nonce&#39;: oauth.generate_nonce(),
+        &#39;signature_method&#39;: &quot;HMAC-SHA1&quot;,
+        &#39;oauth_token&#39;:self.token.key,
+        &#39;oauth_consumer_key&#39;:self.consumer.key,
+    }
+
+    defaults.update(parameters)
+    self.parameters = defaults
+
+def makeCall(self):
+    self.parameters.update(self.getParameters())
+    req = oauth.Request(method=&quot;GET&quot;, url=self.url, parameters=self.parameters)
+    req[&#39;oauth_signature&#39;] = oauth.SignatureMethod_HMAC_SHA1().sign(req,self.consumer,self.token)
+    h = httplib2.Http(&quot;.cache&quot;)
+    resp, content = h.request(req.to_url(), &quot;GET&quot;)
+    self.content = content
+    self.json = json.loads(content)
+
+    if self.json[&quot;stat&quot;] == &quot;ok&quot;:
+        return True
+    else:
+        return False
+
+def getParameters(self):
+    raise NotImplementedError
+</code></pre>
+</div>

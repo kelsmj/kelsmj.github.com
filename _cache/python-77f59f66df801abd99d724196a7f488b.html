@@ -1,0 +1,38 @@
+<div class="highlight"><pre><span class="c"># url to get access token</span>
+<span class="n">access_token_url</span> <span class="o">=</span> <span class="s">&quot;http://www.flickr.com/services/oauth/access_token&quot;</span>
+
+<span class="c"># Now you need to exchange your Request Token for an Access Token</span>
+<span class="c"># Set the base oauth_* parameters along with any other parameters required</span>
+<span class="c"># for the API call.</span>
+<span class="n">access_token_parms</span> <span class="o">=</span> <span class="p">{</span>
+	<span class="s">&#39;oauth_consumer_key&#39;</span><span class="p">:</span> <span class="n">keys</span><span class="o">.</span><span class="n">apikey</span><span class="p">,</span>
+	<span class="s">&#39;oauth_nonce&#39;</span><span class="p">:</span> <span class="n">oauth</span><span class="o">.</span><span class="n">generate_nonce</span><span class="p">(),</span>
+	<span class="s">&#39;oauth_signature_method&#39;</span><span class="p">:</span><span class="s">&quot;HMAC-SHA1&quot;</span><span class="p">,</span>
+	<span class="s">&#39;oauth_timestamp&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())),</span>
+	<span class="s">&#39;oauth_token&#39;</span><span class="p">:</span><span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">],</span>
+	<span class="s">&#39;oauth_verifier&#39;</span> <span class="p">:</span> <span class="n">oauth_verifier</span>
+<span class="p">}</span>
+
+<span class="c">#setup request</span>
+<span class="n">req</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">access_token_url</span><span class="p">,</span>
+	<span class="n">parameters</span><span class="o">=</span><span class="n">access_token_parms</span><span class="p">)</span>
+
+<span class="c">#create the signature</span>
+<span class="n">signature</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">SignatureMethod_HMAC_SHA1</span><span class="p">()</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="n">consumer</span><span class="p">,</span><span class="n">token</span><span class="p">)</span>
+
+<span class="c"># assign the signature to the request</span>
+<span class="n">req</span><span class="p">[</span><span class="s">&#39;oauth_signature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">signature</span>
+
+<span class="c">#make the request</span>
+<span class="n">h</span> <span class="o">=</span> <span class="n">httplib2</span><span class="o">.</span><span class="n">Http</span><span class="p">(</span><span class="s">&quot;.cache&quot;</span><span class="p">)</span>
+<span class="n">resp</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">to_url</span><span class="p">(),</span> <span class="s">&quot;GET&quot;</span><span class="p">)</span>
+
+<span class="c">#parse the response</span>
+<span class="n">access_token_resp</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">urlparse</span><span class="o">.</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
+
+<span class="c">#write out a file with the oauth_token and oauth_token_secret</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;token&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+	<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">access_token_resp</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+	<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">access_token_resp</span><span class="p">[</span><span class="s">&#39;oauth_token_secret&#39;</span><span class="p">])</span>
+<span class="n">f</span><span class="o">.</span><span class="n">closed</span>
+</pre></div>

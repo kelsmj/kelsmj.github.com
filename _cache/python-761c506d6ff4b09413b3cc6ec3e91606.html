@@ -1,0 +1,29 @@
+<div class="highlight"><pre><span class="n">authorize_url</span> <span class="o">=</span> <span class="s">&quot;http://www.flickr.com/services/oauth/authorize&quot;</span>
+
+<span class="c">#parse the content</span>
+<span class="n">request_token</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">urlparse</span><span class="o">.</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">content</span><span class="p">))</span>
+
+<span class="k">print</span> <span class="s">&quot;Request Token:&quot;</span>
+<span class="k">print</span> <span class="s">&quot;    - oauth_token        = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">]</span>
+<span class="k">print</span> <span class="s">&quot;    - oauth_token_secret = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token_secret&#39;</span><span class="p">]</span>
+<span class="k">print</span>
+
+<span class="c"># Create the token object with returned oauth_token and oauth_token_secret</span>
+<span class="n">token</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Token</span><span class="p">(</span><span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">],</span>
+	<span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token_secret&#39;</span><span class="p">])</span>
+
+<span class="c"># You need to authorize this app via your browser.</span>
+<span class="k">print</span> <span class="s">&quot;Go to the following link in your browser:&quot;</span>
+<span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">?oauth_token=</span><span class="si">%s</span><span class="s">&amp;perms=read&quot;</span> <span class="o">%</span>
+	<span class="p">(</span><span class="n">authorize_url</span><span class="p">,</span> <span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">])</span>
+<span class="k">print</span>
+
+<span class="c"># Once you get the verified pin, input it</span>
+<span class="n">accepted</span> <span class="o">=</span> <span class="s">&#39;n&#39;</span>
+<span class="k">while</span> <span class="n">accepted</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;n&#39;</span><span class="p">:</span>
+    <span class="n">accepted</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&#39;Have you authorized me? (y/n) &#39;</span><span class="p">)</span>
+<span class="n">oauth_verifier</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&#39;What is the PIN? &#39;</span><span class="p">)</span>
+
+<span class="c">#set the oauth_verifier token</span>
+<span class="n">token</span><span class="o">.</span><span class="n">set_verifier</span><span class="p">(</span><span class="n">oauth_verifier</span><span class="p">)</span>
+</pre></div>

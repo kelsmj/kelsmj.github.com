@@ -1,0 +1,28 @@
+<div class="highlight"><pre><span class="k">class</span> <span class="nc">FlickrPhotosGetSizes</span><span class="p">(</span><span class="n">FlickrApiMethod</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=&amp;</span><span class="c">#39;flickr.photos.getSizes&amp;#39;&lt;/p&gt;</span>
+<span class="o">&lt;</span><span class="n">div</span> <span class="n">class</span><span class="o">=</span><span class="s">&quot;highlight&quot;</span><span class="o">&gt;&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span> <span class="n">class</span><span class="o">=</span><span class="s">&quot;text&quot;</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nojsoncallback</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">format</span><span class="o">=&amp;</span><span class="c">#39;json&amp;#39;,parameters=None,photo_id=None):</span>
+    <span class="n">FlickrApiMethod</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nojsoncallback</span><span class="p">,</span><span class="n">format</span><span class="p">,</span><span class="n">parameters</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">photo_id</span> <span class="o">=</span> <span class="n">photo_id</span>
+
+<span class="k">def</span> <span class="nf">getParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">p</span> <span class="o">=</span><span class="p">{</span>
+        <span class="o">&amp;</span><span class="c">#39;method&amp;#39;:&amp;#39;flickr.photos.getSizes&amp;#39;,</span>
+        <span class="o">&amp;</span><span class="c">#39;photo_id&amp;#39;:self.photo_id</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">p</span>
+
+<span class="k">def</span> <span class="nf">writePhotos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">sizes</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;][</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">size</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;]:</span>
+        <span class="n">opener</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">build_opener</span><span class="p">()</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">opener</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">source</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;])</span>
+        <span class="n">my_picture</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">label</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="o">&amp;</span><span class="c">#39; &amp;#39;, &amp;#39;_&amp;#39;) +&amp;quot;_&amp;quot; + self.photo_id + o[&amp;quot;source&amp;quot;][-4:]</span>
+        <span class="k">print</span> <span class="n">filename</span>
+        <span class="n">fout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;</span><span class="n">wb</span><span class="o">&amp;</span><span class="n">quot</span><span class="p">;)</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">my_picture</span><span class="p">)</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">div</span><span class="o">&gt;</span>
+
+<span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</pre></div>

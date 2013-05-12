@@ -1,0 +1,23 @@
+<div class="highlight"><pre><code class="text">def __init__(self,nojsoncallback=True,format=&#39;json&#39;,parameters=None,photo_id=None):
+    FlickrApiMethod.__init__(self,nojsoncallback,format,parameters)
+    self.photo_id = photo_id
+
+def getParameters(self):
+    p ={
+        &#39;method&#39;:&#39;flickr.photos.getSizes&#39;,
+        &#39;photo_id&#39;:self.photo_id
+    }
+    return p
+
+def writePhotos(self):
+    for o in self.json[&quot;sizes&quot;][&quot;size&quot;]:
+        opener = urllib2.build_opener()
+        page = opener.open(o[&quot;source&quot;])
+        my_picture = page.read()
+        filename = o[&quot;label&quot;].replace(&#39; &#39;, &#39;_&#39;) +&quot;_&quot; + self.photo_id + o[&quot;source&quot;][-4:]
+        print filename
+        fout = open(filename,&quot;wb&quot;)
+        fout.write(my_picture)
+        fout.close()
+</code></pre>
+</div>
