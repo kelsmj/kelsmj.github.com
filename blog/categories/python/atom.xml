@@ -4,7 +4,7 @@
   <title><![CDATA[Category: python | Matt Kelsey]]></title>
   <link href="http://kelsmj.github.com/blog/categories/python/atom.xml" rel="self"/>
   <link href="http://kelsmj.github.com/"/>
-  <updated>2013-05-01T06:29:50-04:00</updated>
+  <updated>2013-05-12T10:25:17-04:00</updated>
   <id>http://kelsmj.github.com/</id>
   <author>
     <name><![CDATA[Matt Kelsey]]></name>
@@ -14,167 +14,27 @@
 
   
   <entry>
-    <title type="html"><![CDATA[How I Setup VirtualEnv and VirtualEnvWrapper on my Mac]]></title>
-    <link href="http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/"/>
-    <updated>2013-04-30T14:23:00-04:00</updated>
-    <id>http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac</id>
-    <content type="html"><![CDATA[<p>The following are the steps I take to setup up <a href="http://www.virtualenv.org/en/latest/">VirtualEnv</a> and <a href="http://virtualenvwrapper.readthedocs.org/en/latest/">VirtualEnvWrapper</a> on a new machine.</p>
+    <title type="html"><![CDATA[Authorizing and Signing a Twitter API Call using Python]]></title>
+    <link href="http://kelsmj.github.com/2013/05/01/authorizing-and-signing-a-twitter-api-call-using-python/"/>
+    <updated>2013-05-01T11:10:00-04:00</updated>
+    <id>http://kelsmj.github.com/2013/05/01/authorizing-and-signing-a-twitter-api-call-using-python</id>
+    <content type="html"><![CDATA[<p>I was reading through Twitter’s excellent documenation on <a href="https://dev.twitter.com/docs/auth/authorizing-request">Authorizing</a> and <a href="https://dev.twitter.com/docs/auth/creating-signature">Signing</a> an API request and decided I wanted to give implementing it a shot.  The goal was to use as few external python libraries as possible.  The only library I ended up using was the wonderful <a href="http://docs.python-requests.org/en/latest/">Requests: HTTP for Humans</a> library to actually make the call to twitter to get my user timeline. The git repo for this is located <a href="https://github.com/kelsmj/twitter_signature">here</a>.</p>
 
-<ul>
-<li><p>Make sure pip is installed by running pip in the terminal.</p></li>
-<li><p>If it isn't installed, install by doing</p></li>
-</ul>
+<p>Below is an explanation of the code I wrote, in order to accomplish this.  I am assuming one would know how to setup and get the needed keys for a twitter application.</p>
 
+<p>The code is assuming you will have a ‘settings.cfg’ file that houses your twitter_consumer_secret, twitter_consumer_key, access_token, and access_token_secret.</p>
 
-<p><code>   
-sudo easy_install pip
-</code></p>
-
-<ul>
-<li>Next, install virtualenv and virtualenvwrapper</li>
-</ul>
-
+<p>It looks like:</p>
 
 <p><code>
-sudo pip install virtualenvwrapper
+[Keys]
+twitter_consumer_secret: YOUR_CONSUMER_SECRET
+twitter_consumer_key: YOUR_CONSUMER_KEY
+access_token: YOUR_ACCESS_TOKEN
+access_token_secret: YOUR_ACCESS_TOKEN_SECRET
 </code></p>
 
-<p><code>
-sudo pip install virtualenvwrapper
-</code></p>
-
-<ul>
-<li><p>Open up your .bash_profile or .profile, and after your PATH statement, add the following</p>
-
-<p>  <div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>  <span class="c"># set where virutal environments will live</span>
-</span><span class='line'>  <span class="nb">export </span><span class="nv">WORKON_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/.virtualenvs
-</span><span class='line'>  <span class="c"># ensure all new environments are isolated from the site-packages directory</span>
-</span><span class='line'>  <span class="nb">export </span><span class="nv">VIRTUALENVWRAPPER_VIRTUALENV_ARGS</span><span class="o">=</span><span class="s1">&#39;--no-site-packages&#39;</span>
-</span><span class='line'>  <span class="c"># use the same directory for virtualenvs as virtualenvwrapper</span>
-</span><span class='line'>  <span class="nb">export </span><span class="nv">PIP_VIRTUALENV_BASE</span><span class="o">=</span><span class="nv">$WORKON_HOME</span>
-</span><span class='line'>  <span class="c"># makes pip detect an active virtualenv and install to it</span>
-</span><span class='line'>  <span class="nb">export </span><span class="nv">PIP_RESPECT_VIRTUALENV</span><span class="o">=</span><span class="nb">true</span>
-</span><span class='line'><span class="nb">  </span><span class="k">if</span> <span class="o">[[</span> -r /usr/local/bin/virtualenvwrapper.sh <span class="o">]]</span>; <span class="k">then</span>&lt;/p&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;  <span class="nb">source</span> /usr/local/bin/virtualenvwrapper.sh
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>  <span class="k">else</span>
-</span><span class='line'>
-</span><span class='line'>&lt;pre&gt;&lt;code&gt;  <span class="nb">echo</span> <span class="s2">&quot;WARNING: Can&#39;t find virtualenvwrapper.sh&quot;</span>
-</span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
-</span><span class='line'>
-</span><span class='line'>&lt;p&gt;  <span class="k">fi</span>
-</span><span class='line'>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
-<li><p>Open a new terminal window.  You should see virtualenvwrapper.sh being run and setting up your .virtualenvs directory.</p></li>
-<li><p>Test creating a new virtualenv</p></li>
-</ul>
-
-
-<p><code>
-$ mkvirtualenv testenv
-</code></p>
-
-<ul>
-<li>You should see something in the console like</li>
-</ul>
-
-
-<p><code>
-New python executable in testenv/bin/python
-Installing setuptools............done.
-Installing pip...............done.
-virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/predeactivate
-virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/postdeactivate
-virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/preactivate
-virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/postactivate
-virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/get_env_details
-</code></p>
-
-<ul>
-<li><p>That should put you into a new virtualenv called "testenv"</p></li>
-<li><p>Lets install some packages and create a requirements.txt file</p></li>
-</ul>
-
-
-<p><code>
-$ pip install rq
-$ pip install requests
-$ pip install google-api-python-client
-$ pip freeze &gt; requirements.txt
-</code></p>
-
-<ul>
-<li><p>Your have just installed 3 python packages into your virtual environment, and created a .txt file that will have all the necessary information in order to reproduce your environment.</p></li>
-<li><p>You can leave your virtualenv by doing</p></li>
-</ul>
-
-
-<p><code>
-deactivate testenv
-</code></p>
-
-<ul>
-<li>To create a new virtualenv, and install the libraries based on the requirements.txt file you just created, just do the following.</li>
-</ul>
-
-
-<p><code>
-mkvirtualenv testenv2
-pip install -r requirements.txt
-</code></p>
-
-<ul>
-<li>List of commonly used commands
-
-<ul>
-<li>mkvirtualenv (create a new virtualenv)</li>
-<li>rmvirtualenv (remove an existing virtualenv)</li>
-<li>workon (change the current virtualenv)</li>
-<li>add2virtualenv (add external packages in a .pth file to current virtualenv)</li>
-<li>cdsitepackages (cd into the site-packages directory of current virtualenv)</li>
-<li>cdvirtualenv (cd into the root of the current virtualenv)</li>
-<li>deactivate (deactivate virtualenv, which calls several hooks)</li>
-</ul>
-</li>
-</ul>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Download Photos From Flickr Via API]]></title>
-    <link href="http://kelsmj.github.com/2011/07/09/Flickr-Api-Grab-Photos-Example/"/>
-    <updated>2011-07-09T14:30:00-04:00</updated>
-    <id>http://kelsmj.github.com/2011/07/09/Flickr-Api-Grab-Photos-Example</id>
-    <content type="html"><![CDATA[<p>In my <a href="http://mkelsey.com/2011/07/03/Flickr-oAuth-Python-Example.html">previous post</a>, I gave an example of how to authenticate a user against the Flickr API using their new OAuth authentication scheme.</p>
-
-<p>I am going to expand on that post a bit, and show you how to download all the images for a given photo using the <a href="http://www.flickr.com/services/api/explore/flickr.photos.getSizes">flickr.photos.getSizes</a> API call.</p>
-
-<p>If you followed my previous post, you should have a "token" file in your directory that contains the "oauth_token" and "oauth_token_secret" in it.  You should also have an "apikeys" file that contains your application "api_key" and "secret".  We will need some code to read these files to get the keys and secrets.</p>
-
-<p>Here is what I came up with:</p>
+<p>First off, lets look at the main part of the program.  The first part of the program just sets up some configuration variables.</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -215,11 +75,630 @@ pip install -r requirements.txt
 <span class='line-number'>37</span>
 <span class='line-number'>38</span>
 <span class='line-number'>39</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">APIKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">if</span> <span class="o">&lt;</span><span class="n">strong</span><span class="o">&gt;</span><span class="n">name</span><span class="o">&lt;/</span><span class="n">strong</span><span class="o">&gt;</span> <span class="o">==</span> <span class="err">‘</span><span class="o">&lt;</span><span class="n">strong</span><span class="o">&gt;</span><span class="n">main</span><span class="o">&lt;/</span><span class="n">strong</span><span class="o">&gt;</span><span class="err">’</span><span class="p">:</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="s">&quot;&quot;&quot;Base class to read the APIKeys from file&quot;&quot;&quot;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c">#Read the Config File to get the twitter keys and tokens</span>
+</span><span class='line'>  <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="o">.</span><span class="n">RawConfigParser</span><span class="p">()</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="err">‘</span><span class="n">settings</span><span class="o">.</span><span class="n">cfg</span><span class="err">’</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;apikeys&#39;</span><span class="p">):</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c">#method, url and parameters to call</span>
+</span><span class='line'>  <span class="n">method</span> <span class="o">=</span> <span class="err">“</span><span class="n">get</span><span class="err">”</span>
+</span><span class='line'>  <span class="n">url</span> <span class="o">=</span> <span class="err">“</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">api</span><span class="o">.</span><span class="n">twitter</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="mf">1.1</span><span class="o">/</span><span class="n">statuses</span><span class="o">/</span><span class="n">user_timeline</span><span class="o">.</span><span class="n">json</span><span class="err">”</span>
+</span><span class='line'>  <span class="n">url_parameters</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>      <span class="err">‘</span><span class="n">exclude_replies</span><span class="err">’</span><span class="p">:</span> <span class="err">‘</span><span class="n">true</span><span class="err">’</span>
+</span><span class='line'>  <span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c">#configuration hash for the keys</span>
+</span><span class='line'>  <span class="n">keys</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>      <span class="err">“</span><span class="n">twitter_consumer_secret</span><span class="err">”</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+</span><span class='line'>          <span class="err">‘</span><span class="n">Keys</span><span class="err">’</span><span class="p">,</span> <span class="err">‘</span><span class="n">twitter_consumer_secret</span><span class="err">’</span><span class="p">),</span>
+</span><span class='line'>      <span class="err">“</span><span class="n">twitter_consumer_key</span><span class="err">”</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="err">‘</span><span class="n">Keys</span><span class="err">’</span><span class="p">,</span> <span class="err">‘</span><span class="n">twitter_consumer_key</span><span class="err">’</span><span class="p">),</span>
+</span><span class='line'>      <span class="err">“</span><span class="n">access_token</span><span class="err">”</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="err">‘</span><span class="n">Keys</span><span class="err">’</span><span class="p">,</span> <span class="err">‘</span><span class="n">access_token</span><span class="err">’</span><span class="p">),</span>
+</span><span class='line'>      <span class="err">“</span><span class="n">access_token_secret</span><span class="err">”</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="err">‘</span><span class="n">Keys</span><span class="err">’</span><span class="p">,</span> <span class="err">‘</span><span class="n">access_token_secret</span><span class="err">’</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">oauth_parameters</span> <span class="o">=</span> <span class="n">get_oauth_parameters</span><span class="p">(</span>
+</span><span class='line'>      <span class="n">keys</span><span class="p">[</span><span class="err">‘</span><span class="n">twitter_consumer_key</span><span class="err">’</span><span class="p">],</span>
+</span><span class='line'>      <span class="n">keys</span><span class="p">[</span><span class="err">‘</span><span class="n">access_token</span><span class="err">’</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">oauth_parameters</span><span class="p">[</span><span class="err">‘</span><span class="n">oauth_signature</span><span class="err">’</span><span class="p">]</span> <span class="o">=</span> <span class="n">generate_signature</span><span class="p">(</span>
+</span><span class='line'>      <span class="n">method</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">url</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">url_parameters</span><span class="p">,</span> <span class="n">oauth_parameters</span><span class="p">,</span>
+</span><span class='line'>      <span class="n">keys</span><span class="p">[</span><span class="err">‘</span><span class="n">twitter_consumer_key</span><span class="err">’</span><span class="p">],</span>
+</span><span class='line'>      <span class="n">keys</span><span class="p">[</span><span class="err">‘</span><span class="n">twitter_consumer_secret</span><span class="err">’</span><span class="p">],</span>
+</span><span class='line'>      <span class="n">keys</span><span class="p">[</span><span class="err">‘</span><span class="n">access_token_secret</span><span class="err">’</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="err">‘</span><span class="n">Authorization</span><span class="err">’</span><span class="p">:</span> <span class="n">create_auth_header</span><span class="p">(</span><span class="n">oauth_parameters</span><span class="p">)}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">url</span> <span class="o">+=</span> <span class="err">‘?’</span> <span class="o">+</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">(</span><span class="n">url_parameters</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">print</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">),</span> <span class="n">sort_keys</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Next, lets get a collect the 6 key/value pair parameters needed for the <em>Authorization Header</em> and for generating the signature.  These 6 parameters will be used in generating the signature, and then that signature plus these 6 parameters will be used as the <em>Authorization Header</em> for the request.</p>
+
+<dl>
+  <dt>oauth_timestamp</dt>
+  <dd>Indicates when the request was created</dd>
+  <dt>oauth_signature_method</dt>
+  <dd>Cryptographic hash function used to sign the request</dd>
+  <dt>oauth_version</dt>
+  <dd>Oauth version used</dd>
+  <dt>oauth_token</dt>
+  <dd>The Access Token generated by twitter when a user authorizes a twitter app to access their account</dd>
+  <dt>oauth_nonce</dt>
+  <dd>A unique token generated per request.  This helps guard against replay attacks</dd>
+  <dt>oauth_consumer_key</dt>
+  <dd>Identifies which application is making the request</dd>
+</dl>
+
+<p>I accomplish this in the <strong>get_oauth_parameters</strong> function.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">get_oauth_parameters</span><span class="p">(</span><span class="n">consumer_key</span><span class="p">,</span> <span class="n">access_token</span><span class="p">):</span>
+</span><span class='line'>    <span class="err">“</span><span class="s">&quot;”Returns OAuth parameters needed for making request”””</span>
+</span><span class='line'>    <span class="n">oauth_parameters</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>        <span class="err">‘</span><span class="n">oauth_timestamp</span><span class="err">’</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())),</span>
+</span><span class='line'>        <span class="err">‘</span><span class="n">oauth_signature_method</span><span class="err">’</span><span class="p">:</span> <span class="err">“</span><span class="n">HMAC</span><span class="o">-</span><span class="n">SHA1</span><span class="err">”</span><span class="p">,</span>
+</span><span class='line'>        <span class="err">‘</span><span class="n">oauth_version</span><span class="err">’</span><span class="p">:</span> <span class="err">“</span><span class="mf">1.0</span><span class="err">”</span><span class="p">,</span>
+</span><span class='line'>        <span class="err">‘</span><span class="n">oauth_token</span><span class="err">’</span><span class="p">:</span> <span class="n">access_token</span><span class="p">,</span>
+</span><span class='line'>        <span class="err">‘</span><span class="n">oauth_nonce</span><span class="err">’</span><span class="p">:</span> <span class="n">get_nonce</span><span class="p">(),</span>
+</span><span class='line'>        <span class="err">‘</span><span class="n">oauth_consumer_key</span><span class="err">’</span><span class="p">:</span> <span class="n">consumer_key</span>
+</span><span class='line'>    <span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">return</span> <span class="n">oauth_parameters</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>The results of this function will look something like:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">{</span>
+</span><span class='line'>  <span class="err">‘</span><span class="n">oauth_nonce</span><span class="err">’</span><span class="p">:</span> <span class="err">‘</span><span class="n">NDIzMjg0NTQ5NDI4ODgwNDg3OTg2OTMw</span><span class="err">’</span><span class="p">,</span>
+</span><span class='line'>  <span class="err">‘</span><span class="n">oauth_timestamp</span><span class="err">’</span><span class="p">:</span> <span class="err">‘</span><span class="mi">1368365251</span><span class="err">’</span><span class="p">,</span>
+</span><span class='line'>  <span class="err">‘</span><span class="n">oauth_consumer_key</span><span class="err">’</span><span class="p">:</span> <span class="err">‘</span><span class="n">YOUR_CONSUMER_KEY</span><span class="err">’</span><span class="p">,</span>
+</span><span class='line'>  <span class="err">‘</span><span class="n">oauth_signature_method</span><span class="err">’</span><span class="p">:</span> <span class="err">‘</span><span class="n">HMAC</span><span class="o">-</span><span class="n">SHA1</span><span class="err">’</span><span class="p">,</span>
+</span><span class='line'>  <span class="err">‘</span><span class="n">oauth_version</span><span class="err">’</span><span class="p">:</span> <span class="err">‘</span><span class="mf">1.0</span><span class="err">’</span><span class="p">,</span>
+</span><span class='line'>  <span class="err">‘</span><span class="n">oauth_token</span><span class="err">’</span><span class="p">:</span> <span class="err">‘</span><span class="n">YOUR_ACCESS_TOKEN</span><span class="err">’</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>To get the nonce, I just do this:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">get_nonce</span><span class="p">():</span>
+</span><span class='line'>    <span class="err">“</span><span class="s">&quot;”Unique token generated for each request”””</span>
+</span><span class='line'>    <span class="n">n</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span>
+</span><span class='line'>        <span class="err">‘‘</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">24</span><span class="p">)]))</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">n</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>After collecting the needed parameters, we can go ahead and generate the <em>oauth_signature</em> header value.  The <em>generate_signature</em> method will need the following:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">oauth_parameters</span><span class="p">[</span><span class="s">&#39;oauth_signature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">generate_signature</span><span class="p">(</span>
+</span><span class='line'>    <span class="n">method</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">url</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">url_parameters</span><span class="p">,</span> <span class="n">oauth_parameters</span><span class="p">,</span>
+</span><span class='line'>    <span class="n">keys</span><span class="p">[</span><span class="s">&#39;twitter_consumer_key&#39;</span><span class="p">],</span>
+</span><span class='line'>    <span class="n">keys</span><span class="p">[</span><span class="s">&#39;twitter_consumer_secret&#39;</span><span class="p">],</span>
+</span><span class='line'>    <span class="n">keys</span><span class="p">[</span><span class="s">&#39;access_token_secret&#39;</span><span class="p">]</span>
+</span><span class='line'><span class="p">)</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<dl>
+  <dt>method</dt>
+  <dd>This will either be a GET or a POST</dd>
+  <dt>url</dt>
+  <dd>The URL for which the request is directed</dd>
+  <dt>url_parameters</dt>
+  <dd>Any endpoint specific url_parameters a specific request might need</dd>
+  <dt>oauth_paramters</dt>
+  <dd>The oauth_parameters we built above</dd>
+  <dt>oauth_consumer_key</dt>
+  <dd>Your consumer key</dd>
+  <dt>oauth_consumer_secret</dt>
+  <dd>Your consumer secret</dd>
+  <dt>oauth_token_secret</dt>
+  <dd>Your access token secret</dd>
+  <dt>status</dt>
+  <dd>Optional, but if posting a tweet, this needs to be part of the signature</dd>
+</dl>
+
+<p>The method looks like:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">generate_signature</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">url_parameters</span><span class="p">,</span> <span class="n">oauth_parameters</span><span class="p">,</span>
+</span><span class='line'>                       <span class="n">oauth_consumer_key</span><span class="p">,</span> <span class="n">oauth_consumer_secret</span><span class="p">,</span>
+</span><span class='line'>                       <span class="n">oauth_token_secret</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</span><span class='line'>    <span class="err">“</span><span class="s">&quot;”Create the signature base string”””&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="c">#Combine parameters into one hash</span>
+</span><span class='line'><span class="n">temp</span> <span class="o">=</span> <span class="n">collect_parameters</span><span class="p">(</span><span class="n">oauth_parameters</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">url_parameters</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#Create string of combined url and oauth parameters</span>
+</span><span class='line'><span class="n">parameter_string</span> <span class="o">=</span> <span class="n">stringify_parameters</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#Create your Signature Base String</span>
+</span><span class='line'><span class="n">signature_base_string</span> <span class="o">=</span> <span class="p">(</span>
+</span><span class='line'>    <span class="n">method</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s">&#39;&amp;amp;&#39;</span> <span class="o">+</span>
+</span><span class='line'>    <span class="n">escape</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">url</span><span class="p">))</span> <span class="o">+</span> <span class="s">&#39;&amp;amp;&#39;</span> <span class="o">+</span>
+</span><span class='line'>    <span class="n">escape</span><span class="p">(</span><span class="n">parameter_string</span><span class="p">)</span>
+</span><span class='line'><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="c">#Get the signing key</span>
+</span><span class='line'><span class="n">signing_key</span> <span class="o">=</span> <span class="n">create_signing_key</span><span class="p">(</span><span class="n">oauth_consumer_secret</span><span class="p">,</span> <span class="n">oauth_token_secret</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">return</span> <span class="n">calculate_signature</span><span class="p">(</span><span class="n">signing_key</span><span class="p">,</span> <span class="n">signature_base_string</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+</code></pre>
+
+<p>The first part of this method combines the <em>oauth_parameters</em>, <em>status</em> and <em>url_parameters</em> into a hash, sorts the paramaters alphabetically using a OrderedDict and encodes into a single string.</p>
+
+<p>According to the Twitter documentation, in order to generate the proper sting you need to:</p>
+
+<ul>
+  <li>Percent encode every key and value that will be signed</li>
+  <li>Sort the list of parameters alphabetically by encoded key</li>
+  <li>For each key/value pair:
+    <ul>
+      <li>Append the encded key to the output string</li>
+      <li>Append the ‘=’ character to the output string</li>
+      <li>Append the encoded value to the output string</li>
+      <li>If there are more key/value pairs remaining, append a ‘&amp;’ character to the output string</li>
+    </ul>
+  </li>
+</ul>
+
+<p>I accomplish this in the <em>stringify_parameters</em> method</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">stringify_parameters</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
+</span><span class='line'>    <span class="err">“</span><span class="s">&quot;”Orders parameters, and generates string representation of parameters”””</span>
+</span><span class='line'>    <span class="n">output</span> <span class="o">=</span> <span class="err">‘’</span>
+</span><span class='line'>    <span class="n">ordered_parameters</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span class='line'>    <span class="n">ordered_parameters</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">counter</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class='line'><span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ordered_parameters</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+</span><span class='line'>    <span class="n">output</span> <span class="o">+=</span> <span class="n">escape</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span> <span class="o">+</span> <span class="s">&#39;=&#39;</span> <span class="o">+</span> <span class="n">escape</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+</span><span class='line'>    <span class="k">if</span> <span class="n">counter</span> <span class="o">&amp;</span><span class="n">lt</span><span class="p">;</span> <span class="nb">len</span><span class="p">(</span><span class="n">ordered_parameters</span><span class="p">):</span>
+</span><span class='line'>        <span class="n">output</span> <span class="o">+=</span> <span class="s">&#39;&amp;amp;&#39;</span>
+</span><span class='line'>        <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">return</span> <span class="n">output</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>After we have our stringified parameters, we can create our <em>signature_base_string</em>.  In order to do this we need to:</p>
+
+<ul>
+  <li>Conert the HTTP method to uppercase</li>
+  <li>Append a ‘&amp;’ character</li>
+  <li>Percent Encode the URL and append it to the output string</li>
+  <li>Append a ‘&amp;’ character</li>
+  <li>Percent encode the parameter string and append it to the output string</li>
+</ul>
+
+<p>We are now able to create our signing key and then calculate the signature to put in the <em>Authorization Header</em>.</p>
+
+<p>To create the signing key, we simply need to combine the <em>oauth_consumer_secret</em> and the <em>oauth_token_secret</em> joined by a ‘&amp;’ character.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">create_signing_key</span><span class="p">(</span><span class="n">oauth_consumer_secret</span><span class="p">,</span> <span class="n">oauth_token_secret</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</span><span class='line'>    <span class="err">“</span><span class="s">&quot;”Create key to sign request with”””</span>
+</span><span class='line'>    <span class="n">signing_key</span> <span class="o">=</span> <span class="n">escape</span><span class="p">(</span><span class="n">oauth_consumer_secret</span><span class="p">)</span> <span class="o">+</span> <span class="err">‘</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="err">’</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">if</span> <span class="n">oauth_token_secret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">signing_key</span> <span class="o">+=</span> <span class="n">escape</span><span class="p">(</span><span class="n">oauth_token_secret</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">return</span> <span class="n">signing_key</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Now that we have the signing_key, we can take that along with the signature_base_string and calculate our SHA1 signature.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">def</span> <span class="nf">calculate_signature</span><span class="p">(</span><span class="n">signing_key</span><span class="p">,</span> <span class="n">signature_base_string</span><span class="p">):</span>
+</span><span class='line'>    <span class="err">“</span><span class="s">&quot;”Calculate the signature using SHA1”””</span>
+</span><span class='line'>    <span class="n">hashed</span> <span class="o">=</span> <span class="n">hmac</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">signing_key</span><span class="p">,</span> <span class="n">signature_base_string</span><span class="p">,</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">sig</span> <span class="o">=</span> <span class="n">binascii</span><span class="o">.</span><span class="n">b2a_base64</span><span class="p">(</span><span class="n">hashed</span><span class="o">.</span><span class="n">digest</span><span class="p">())[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">return</span> <span class="n">escape</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+</code></pre>
+
+<p>We have our signature, now all that is left is to create our <em>Authorization Header</em> for the request and make our request.  In order to properly create the header, we need to combine our 6 parameters from the <em>get_oauth_parameters</em> with the signature we just created, order them alphabetically and append them to a string beginning with “OAuth”.  The key/value parameters will need to be separated by a ‘=’, they will both need to be percent encoded and the values enclosed in ‘”’.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">def</span> <span class="nf">create_auth_header</span><span class="p">(</span><span class="n">parameters</span><span class="p">):</span>
+</span><span class='line'>    <span class="err">“</span><span class="s">&quot;”For all collected parameters, order them and create auth header”””</span>
+</span><span class='line'>    <span class="n">ordered_parameters</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span class='line'>    <span class="n">ordered_parameters</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+</span><span class='line'>    <span class="n">auth_header</span> <span class="o">=</span> <span class="p">(</span>
+</span><span class='line'>        <span class="err">‘</span><span class="o">%</span><span class="n">s</span><span class="o">=</span><span class="err">”</span><span class="o">%</span><span class="n">s</span><span class="err">”’</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ordered_parameters</span><span class="o">.</span><span class="n">iteritems</span><span class="p">())</span>
+</span><span class='line'>    <span class="n">val</span> <span class="o">=</span> <span class="err">“</span><span class="n">OAuth</span> <span class="err">“</span> <span class="o">+</span> <span class="err">‘</span><span class="p">,</span> <span class="err">‘</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">auth_header</span><span class="p">)</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">val</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>We should now be able to make our request:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'>    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="err">‘</span><span class="n">Authorization</span><span class="err">’</span><span class="p">:</span> <span class="n">create_auth_header</span><span class="p">(</span><span class="n">oauth_parameters</span><span class="p">)}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">url</span> <span class="o">+=</span> <span class="s">&#39;?&#39;</span> <span class="o">+</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">(</span><span class="n">url_parameters</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">print</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">),</span> <span class="n">sort_keys</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+</code></pre>
+
+<p>Feel free to email me with any questions or comments.  The git repo for this is located <a href="https://github.com/kelsmj/twitter_signature">here</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[How I Setup VirtualEnv and VirtualEnvWrapper on my Mac]]></title>
+    <link href="http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/"/>
+    <updated>2013-04-30T14:23:00-04:00</updated>
+    <id>http://kelsmj.github.com/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac</id>
+    <content type="html"><![CDATA[<p>The following are the steps I take to setup up <a href="http://www.virtualenv.org/en/latest/">VirtualEnv</a> and <a href="http://virtualenvwrapper.readthedocs.org/en/latest/">VirtualEnvWrapper</a> on a new machine.</p>
+
+<ul>
+  <li>
+    <p>Make sure pip is installed by running pip in the terminal.</p>
+  </li>
+  <li>
+    <p>If it isn’t installed, install by doing</p>
+  </li>
+</ul>
+
+<p><code>   
+sudo easy_install pip
+</code></p>
+
+<ul>
+  <li>Next, install virtualenv and virtualenvwrapper</li>
+</ul>
+
+<p><code>
+sudo pip install virtualenvwrapper
+</code></p>
+
+<p><code>
+sudo pip install virtualenvwrapper
+</code></p>
+
+<ul>
+  <li>
+    <p>Open up your .bash_profile or .profile, and after your PATH statement, add the following</p>
+
+    <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>  <span class="c"># set where virutal environments will live</span>
+</span><span class='line'>  <span class="nb">export </span><span class="nv">WORKON_HOME</span><span class="o">=</span><span class="nv">$HOME</span>/.virtualenvs
+</span><span class='line'>  <span class="c"># ensure all new environments are isolated from the site-packages directory</span>
+</span><span class='line'>  <span class="nb">export </span><span class="nv">VIRTUALENVWRAPPER_VIRTUALENV_ARGS</span><span class="o">=</span>’–no-site-packages’
+</span><span class='line'>  <span class="c"># use the same directory for virtualenvs as virtualenvwrapper</span>
+</span><span class='line'>  <span class="nb">export </span><span class="nv">PIP_VIRTUALENV_BASE</span><span class="o">=</span><span class="nv">$WORKON_HOME</span>
+</span><span class='line'>  <span class="c"># makes pip detect an active virtualenv and install to it</span>
+</span><span class='line'>  <span class="nb">export </span><span class="nv">PIP_RESPECT_VIRTUALENV</span><span class="o">=</span><span class="nb">true</span>
+</span><span class='line'><span class="nb">  </span><span class="k">if</span> <span class="o">[[</span> -r /usr/local/bin/virtualenvwrapper.sh <span class="o">]]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">      </span><span class="nb">source</span> /usr/local/bin/virtualenvwrapper.sh
+</span><span class='line'>  <span class="k">else</span>
+</span><span class='line'><span class="k">      </span><span class="nb">echo</span> “WARNING: Can’t find virtualenvwrapper.sh”
+</span><span class='line'>  <span class="k">fi</span>
+</span><span class='line'>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+  </li>
+  <li>
+    <p>Open a new terminal window.  You should see virtualenvwrapper.sh being run and setting up your .virtualenvs directory.</p>
+  </li>
+  <li>
+    <p>Test creating a new virtualenv</p>
+  </li>
+</ul>
+
+<p><code>
+$ mkvirtualenv testenv
+</code></p>
+
+<ul>
+  <li>You should see something in the console like</li>
+</ul>
+
+<p><code>
+New python executable in testenv/bin/python
+Installing setuptools............done.
+Installing pip...............done.
+virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/predeactivate
+virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/postdeactivate
+virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/preactivate
+virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/postactivate
+virtualenvwrapper.user_scripts creating /Users/kelsmj/.virtualenvsexport/testenv/bin/get_env_details
+</code></p>
+
+<ul>
+  <li>
+    <p>That should put you into a new virtualenv called “testenv”</p>
+  </li>
+  <li>
+    <p>Lets install some packages and create a requirements.txt file</p>
+  </li>
+</ul>
+
+<p><code>
+$ pip install rq
+$ pip install requests
+$ pip install google-api-python-client
+$ pip freeze &gt; requirements.txt
+</code></p>
+
+<ul>
+  <li>
+    <p>Your have just installed 3 python packages into your virtual environment, and created a .txt file that will have all the necessary information in order to reproduce your environment.</p>
+  </li>
+  <li>
+    <p>You can leave your virtualenv by doing</p>
+  </li>
+</ul>
+
+<p><code>
+deactivate testenv
+</code></p>
+
+<ul>
+  <li>To create a new virtualenv, and install the libraries based on the requirements.txt file you just created, just do the following.</li>
+</ul>
+
+<p><code>
+mkvirtualenv testenv2
+pip install -r requirements.txt
+</code></p>
+
+<ul>
+  <li>List of commonly used commands
+    <ul>
+      <li>mkvirtualenv (create a new virtualenv)</li>
+      <li>rmvirtualenv (remove an existing virtualenv)</li>
+      <li>workon (change the current virtualenv)</li>
+      <li>add2virtualenv (add external packages in a .pth file to current virtualenv)</li>
+      <li>cdsitepackages (cd into the site-packages directory of current virtualenv)</li>
+      <li>cdvirtualenv (cd into the root of the current virtualenv)</li>
+      <li>deactivate (deactivate virtualenv, which calls several hooks)</li>
+    </ul>
+  </li>
+</ul>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Download Photos From Flickr Via API]]></title>
+    <link href="http://kelsmj.github.com/2011/07/09/Flickr-Api-Grab-Photos-Example/"/>
+    <updated>2011-07-09T14:30:00-04:00</updated>
+    <id>http://kelsmj.github.com/2011/07/09/Flickr-Api-Grab-Photos-Example</id>
+    <content type="html"><![CDATA[<p>In my <a href="http://mkelsey.com/2011/07/03/Flickr-oAuth-Python-Example.html">previous post</a>, I gave an example of how to authenticate a user against the Flickr API using their new OAuth authentication scheme.</p>
+
+<p>I am going to expand on that post a bit, and show you how to download all the images for a given photo using the <a href="http://www.flickr.com/services/api/explore/flickr.photos.getSizes">flickr.photos.getSizes</a> API call.  </p>
+
+<p>If you followed my previous post, you should have a “token” file in your directory that contains the “oauth_token” and “oauth_token_secret” in it.  You should also have an “apikeys” file that contains your application “api_key” and “secret”.  We will need some code to read these files to get the keys and secrets.</p>
+
+<p>Here is what I came up with:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">APIKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class='line'>    <span class="err">“</span><span class="s">&quot;”Base class to read the APIKeys from file”””&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;apikeys&#39;</span><span class="p">):</span>
 </span><span class='line'>    <span class="k">try</span><span class="p">:</span>
 </span><span class='line'>        <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 </span><span class='line'>    <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -234,11 +713,10 @@ pip install -r requirements.txt
 </span><span class='line'>        <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">TokenKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">class</span> <span class="nc">TokenKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class='line'>    <span class="err">“</span><span class="s">&quot;”Base class to read the Access Tokens”””&lt;/p&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="s">&quot;&quot;&quot;Base class to read the Access Tokens&quot;&quot;&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;token&#39;</span><span class="p">):</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;token&#39;</span><span class="p">):</span>
 </span><span class='line'>    <span class="k">try</span><span class="p">:</span>
 </span><span class='line'>        <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 </span><span class='line'>    <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -256,7 +734,7 @@ pip install -r requirements.txt
 </span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>The next task at hand was coming up with a base class that can encapsulate all the work needed in order to make subsequent Flickr API calls once you have your api key and token.  I named this class "FlickrApiMethod" and it sets up all the data needed to make Flickr API requests.  It has a "makeCall" method that will make the REST call, load the returned JSON content and return True if the call was successful, or False if it was not.  I plan on expanding on this a bit to support all the different response formats that Flickr supports, but for now it just supports JSON.  This class also has an no implementation "getParameters" method that allows subclasses to fill out additional parameters that are needed for a specialized API call.</p>
+<p>The next task at hand was coming up with a base class that can encapsulate all the work needed in order to make subsequent Flickr API calls once you have your api key and token.  I named this class “FlickrApiMethod” and it sets up all the data needed to make Flickr API requests.  It has a “makeCall” method that will make the REST call, load the returned JSON content and return True if the call was successful, or False if it was not.  I plan on expanding on this a bit to support all the different response formats that Flickr supports, but for now it just supports JSON.  This class also has an no implementation “getParameters” method that allows subclasses to fill out additional parameters that are needed for a specialized API call.</p>
 
 <p>Here is the code:</p>
 
@@ -308,15 +786,10 @@ pip install -r requirements.txt
 <span class='line-number'>46</span>
 <span class='line-number'>47</span>
 <span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">FlickrApiMethod</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">FlickrApiMethod</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class='line'>    <span class="err">“</span><span class="s">&quot;”Base class for Flickr API calls”””&lt;/p&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="s">&quot;&quot;&quot;Base class for Flickr API calls&quot;&quot;&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nojsoncallback</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span><span class="n">parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nojsoncallback</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span><span class="n">parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
 </span><span class='line'>    <span class="n">apifile</span> <span class="o">=</span> <span class="n">APIKeys</span><span class="p">()</span>
 </span><span class='line'>    <span class="n">tokenfile</span> <span class="o">=</span> <span class="n">TokenKeys</span><span class="p">()</span>
 </span><span class='line'>
@@ -361,12 +834,10 @@ pip install -r requirements.txt
 </span><span class='line'>
 </span><span class='line'><span class="k">def</span> <span class="nf">getParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span class='line'>    <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+</code></pre>
 
-<p>Next, I will write a class, that given a unique "photo_id" it will call the <a href="http://www.flickr.com/services/api/explore/flickr.photos.getSizes">flickr.photos.getSizes</a> method and write out the files for all the sizes available.</p>
+<p>Next, I will write a class, that given a unique “photo_id” it will call the <a href="http://www.flickr.com/services/api/explore/flickr.photos.getSizes">flickr.photos.getSizes</a> method and write out the files for all the sizes available.</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -392,15 +863,10 @@ pip install -r requirements.txt
 <span class='line-number'>22</span>
 <span class='line-number'>23</span>
 <span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">FlickrPhotosGetSizes</span><span class="p">(</span><span class="n">FlickrApiMethod</span><span class="p">):</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">FlickrPhotosGetSizes</span><span class="p">(</span><span class="n">FlickrApiMethod</span><span class="p">):</span>
+</span><span class='line'>    <span class="n">name</span> <span class="o">=</span><span class="err">’</span><span class="n">flickr</span><span class="o">.</span><span class="n">photos</span><span class="o">.</span><span class="n">getSizes</span><span class="err">’</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">name</span> <span class="o">=</span><span class="s">&#39;flickr.photos.getSizes&#39;</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nojsoncallback</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span><span class="n">parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">photo_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nojsoncallback</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span><span class="n">parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">photo_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
 </span><span class='line'>    <span class="n">FlickrApiMethod</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nojsoncallback</span><span class="p">,</span><span class="n">format</span><span class="p">,</span><span class="n">parameters</span><span class="p">)</span>
 </span><span class='line'>    <span class="bp">self</span><span class="o">.</span><span class="n">photo_id</span> <span class="o">=</span> <span class="n">photo_id</span>
 </span><span class='line'>
@@ -421,10 +887,8 @@ pip install -r requirements.txt
 </span><span class='line'>        <span class="n">fout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s">&quot;wb&quot;</span><span class="p">)</span>
 </span><span class='line'>        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">my_picture</span><span class="p">)</span>
 </span><span class='line'>        <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+</code></pre>
 
 <p>Finally, a little bit of code to use these classes:</p>
 
@@ -440,26 +904,16 @@ pip install -r requirements.txt
 <span class='line-number'>10</span>
 <span class='line-number'>11</span>
 <span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">print</span> <span class="s">&quot;Please enter a photo id:&quot;</span><span class="p">,</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">print</span> <span class="err">“</span><span class="n">Please</span> <span class="n">enter</span> <span class="n">a</span> <span class="n">photo</span> <span class="nb">id</span><span class="p">:</span><span class="err">”</span><span class="p">,</span>
 </span><span class='line'><span class="n">photoId</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">()</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&quot;Fetching Photo&quot;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'><span class="k">print</span> <span class="err">“</span><span class="n">Fetching</span> <span class="n">Photo</span><span class="err">”</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">photoSizes</span> <span class="o">=</span> <span class="n">FlickrPhotosGetSizes</span><span class="p">(</span><span class="n">photo_id</span> <span class="o">=</span> <span class="n">photoId</span><span class="p">)</span>
-</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="n">photoSizes</span><span class="o">.</span><span class="n">makeCall</span><span class="p">()):</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">print</span> <span class="s">&quot;API Call Success! Writing Photos to Disk&quot;</span>
-</span><span class='line'><span class="n">photoSizes</span><span class="o">.</span><span class="n">writePhotos</span><span class="p">()</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">else</span><span class="p">:</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">print</span> <span class="s">&quot;API Call Failed&quot;</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="n">photoSizes</span><span class="o">.</span><span class="n">makeCall</span><span class="p">()):</span>
+</span><span class='line'>	<span class="k">print</span> <span class="err">“</span><span class="n">API</span> <span class="n">Call</span> <span class="n">Success</span><span class="err">!</span> <span class="n">Writing</span> <span class="n">Photos</span> <span class="n">to</span> <span class="n">Disk</span><span class="err">”</span>
+</span><span class='line'>	<span class="n">photoSizes</span><span class="o">.</span><span class="n">writePhotos</span><span class="p">()</span>
+</span><span class='line'><span class="k">else</span><span class="p">:</span>
+</span><span class='line'>	<span class="k">print</span> <span class="err">“</span><span class="n">API</span> <span class="n">Call</span> <span class="n">Failed</span><span class="err">”</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
 </span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
@@ -484,10 +938,9 @@ pip install -r requirements.txt
 <p>The code below has two prerequisites in order to work correctly:</p>
 
 <ol>
-<li>A text file called "apikeys" in the root directory containing the api_key (consumer_key) and secret for your application.  You get the key and secret by creating a new Flickr Application associated with your account.  Go to "The App Garden":http://www.flickr.com/services/apps/create/apply/ to apply for one.  Each entry in this file needs to be on its own line with the api_key coming first.</li>
-<li>Downloading and installing "python-oauth2":https://github.com/simplegeo/python-oauth2</li>
+  <li>A text file called “apikeys” in the root directory containing the api_key (consumer_key) and secret for your application.  You get the key and secret by creating a new Flickr Application associated with your account.  Go to “The App Garden”:http://www.flickr.com/services/apps/create/apply/ to apply for one.  Each entry in this file needs to be on its own line with the api_key coming first.</li>
+  <li>Downloading and installing “python-oauth2”:https://github.com/simplegeo/python-oauth2</li>
 </ol>
-
 
 <p>To setup python-oauth2:</p>
 
@@ -538,59 +991,35 @@ pip install -r requirements.txt
 <span class='line-number'>27</span>
 <span class='line-number'>28</span>
 <span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'>       <span class="o">&lt;</span><span class="n">br</span><span class="o">/&gt;</span>
-</span><span class='line'><span class="n">url</span> <span class="o">=</span> <span class="s">&quot;http://www.flickr.com/services/oauth/request_token&quot;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">url</span> <span class="o">=</span> <span class="err">“</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">flickr</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">oauth</span><span class="o">/</span><span class="n">request_token</span><span class="err">”</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Set</span> <span class="n">the</span> <span class="n">base</span> <span class="n">oauth_</span><span class="o">*</span> <span class="n">parameters</span> <span class="n">along</span> <span class="k">with</span> <span class="nb">any</span> <span class="n">other</span> <span class="n">parameters</span> <span class="n">required</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;set-the-base-oauth-parameters-along-with-any-other-parameters-required&quot;</span><span class="o">&gt;</span><span class="n">Set</span> <span class="n">the</span> <span class="n">base</span> <span class="n">oauth_</span><span class="o">*</span> <span class="n">parameters</span> <span class="n">along</span> <span class="k">with</span> <span class="nb">any</span> <span class="n">other</span> <span class="n">parameters</span> <span class="n">required</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c"># for the API call.</span>
+</span><span class='line'><span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>	<span class="err">‘</span><span class="n">oauth_timestamp</span><span class="err">’</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())),</span>
+</span><span class='line'>	<span class="err">‘</span><span class="n">oauth_signature_method</span><span class="err">’</span><span class="p">:</span><span class="err">”</span><span class="n">HMAC</span><span class="o">-</span><span class="n">SHA1</span><span class="err">”</span><span class="p">,</span>
+</span><span class='line'>	<span class="err">‘</span><span class="n">oauth_version</span><span class="err">’</span><span class="p">:</span> <span class="err">“</span><span class="mf">1.0</span><span class="err">”</span><span class="p">,</span>
+</span><span class='line'>	<span class="err">‘</span><span class="n">oauth_callback</span><span class="err">’</span><span class="p">:</span> <span class="err">“</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">mkelsey</span><span class="o">.</span><span class="n">com</span><span class="err">”</span><span class="p">,</span>
+</span><span class='line'>	<span class="err">‘</span><span class="n">oauth_nonce</span><span class="err">’</span><span class="p">:</span> <span class="n">oauth</span><span class="o">.</span><span class="n">generate_nonce</span><span class="p">(),</span>
+</span><span class='line'>	<span class="err">‘</span><span class="n">oauth_consumer_key</span><span class="err">’</span><span class="p">:</span> <span class="n">keys</span><span class="o">.</span><span class="n">apikey</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="k">for</span> <span class="n">the</span> <span class="n">API</span> <span class="n">call</span><span class="o">.&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="s">&#39;oauth_timestamp&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())),</span>
-</span><span class='line'><span class="s">&#39;oauth_signature_method&#39;</span><span class="p">:</span><span class="s">&quot;HMAC-SHA1&quot;</span><span class="p">,</span>
-</span><span class='line'><span class="s">&#39;oauth_version&#39;</span><span class="p">:</span> <span class="s">&quot;1.0&quot;</span><span class="p">,</span>
-</span><span class='line'><span class="s">&#39;oauth_callback&#39;</span><span class="p">:</span> <span class="s">&quot;http://www.mkelsey.com&quot;</span><span class="p">,</span>
-</span><span class='line'><span class="s">&#39;oauth_nonce&#39;</span><span class="p">:</span> <span class="n">oauth</span><span class="o">.</span><span class="n">generate_nonce</span><span class="p">(),</span>
-</span><span class='line'><span class="s">&#39;oauth_consumer_key&#39;</span><span class="p">:</span> <span class="n">keys</span><span class="o">.</span><span class="n">apikey</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Setup</span> <span class="n">the</span> <span class="n">Consumer</span> <span class="k">with</span> <span class="n">the</span> <span class="n">api_keys</span> <span class="n">given</span> <span class="n">by</span> <span class="n">the</span> <span class="n">provider</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;setup-the-consumer-with-the-apikeys-given-by-the-provider&quot;</span><span class="o">&gt;</span><span class="n">Setup</span> <span class="n">the</span> <span class="n">Consumer</span> <span class="k">with</span> <span class="n">the</span> <span class="n">api_keys</span> <span class="n">given</span> <span class="n">by</span> <span class="n">the</span> <span class="n">provider</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
 </span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">consumer</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Consumer</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">keys</span><span class="o">.</span><span class="n">apikey</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="n">keys</span><span class="o">.</span><span class="n">apisecret</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Create</span> <span class="n">our</span> <span class="n">request</span><span class="o">.</span> <span class="n">Change</span> <span class="n">method</span><span class="p">,</span> <span class="n">etc</span><span class="o">.</span> <span class="n">accordingly</span><span class="o">.&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;create-our-request-change-method-etc-accordingly&quot;</span><span class="o">&gt;</span><span class="n">Create</span> <span class="n">our</span> <span class="n">request</span><span class="o">.</span> <span class="n">Change</span> <span class="n">method</span><span class="p">,</span> <span class="n">etc</span><span class="o">.</span> <span class="n">accordingly</span><span class="o">.&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">req</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="err">”</span><span class="n">GET</span><span class="err">”</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">params</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">req</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">params</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Create</span> <span class="n">the</span> <span class="n">signature</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;create-the-signature&quot;</span><span class="o">&gt;</span><span class="n">Create</span> <span class="n">the</span> <span class="n">signature</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
 </span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">signature</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">SignatureMethod_HMAC_SHA1</span><span class="p">()</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="n">consumer</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Add</span> <span class="n">the</span> <span class="n">Signature</span> <span class="n">to</span> <span class="n">the</span> <span class="n">request</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;add-the-signature-to-the-request&quot;</span><span class="o">&gt;</span><span class="n">Add</span> <span class="n">the</span> <span class="n">Signature</span> <span class="n">to</span> <span class="n">the</span> <span class="n">request</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">req</span><span class="p">[</span><span class="err">‘</span><span class="n">oauth_signature</span><span class="err">’</span><span class="p">]</span> <span class="o">=</span> <span class="n">signature</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">req</span><span class="p">[</span><span class="s">&#39;oauth_signature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">signature</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Make</span> <span class="n">the</span> <span class="n">request</span> <span class="n">to</span> <span class="n">get</span> <span class="n">the</span> <span class="n">oauth_token</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">oauth_token_secret</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">I</span> <span class="n">had</span> <span class="n">to</span> <span class="n">directly</span> <span class="n">use</span> <span class="n">the</span> <span class="n">httplib2</span> <span class="n">here</span><span class="p">,</span> <span class="n">instead</span> <span class="n">of</span> <span class="n">the</span> <span class="n">oauth</span> <span class="n">library</span><span class="o">.&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">h</span> <span class="o">=</span> <span class="n">httplib2</span><span class="o">.</span><span class="n">Http</span><span class="p">(</span><span class="s">&quot;.cache&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="n">resp</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">to_url</span><span class="p">(),</span> <span class="s">&quot;GET&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;make-the-request-to-get-the-oauthtoken-and-the-oauthtokensecret&quot;</span><span class="o">&gt;</span><span class="n">Make</span> <span class="n">the</span> <span class="n">request</span> <span class="n">to</span> <span class="n">get</span> <span class="n">the</span> <span class="n">oauth_token</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">oauth_token_secret</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c"># I had to directly use the httplib2 here, instead of the oauth library.</span>
+</span><span class='line'><span class="n">h</span> <span class="o">=</span> <span class="n">httplib2</span><span class="o">.</span><span class="n">Http</span><span class="p">(</span><span class="err">“</span><span class="o">.</span><span class="n">cache</span><span class="err">”</span><span class="p">)</span>
+</span><span class='line'><span class="n">resp</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">to_url</span><span class="p">(),</span> <span class="err">“</span><span class="n">GET</span><span class="err">”</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>If all is successful, Flickr include a <em>oauth_token</em> and a <em>oauth_token_secret</em> in the Response.  You can now store those tokens off and prompt a user to go authorize your application.  They will need to go to http://www.flickr.com/services/oauth/authorize with the <em>oauth_token</em> appended as a querystring parameter along with the perms parameter indicating if your application will need read,write and delete privileges.  Once the user authorizes your application, Flickr will redirect to the <em>oauth_callback</em> url specified above with a <em>oauth_verifier</em> querystring parameter that you can then use in the third and final step of oAuth authentication.</p>
@@ -625,59 +1054,33 @@ pip install -r requirements.txt
 <span class='line-number'>26</span>
 <span class='line-number'>27</span>
 <span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">authorize_url</span> <span class="o">=</span> <span class="s">&quot;http://www.flickr.com/services/oauth/authorize&quot;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">authorize_url</span> <span class="o">=</span> <span class="err">“</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">flickr</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">oauth</span><span class="o">/</span><span class="n">authorize</span><span class="err">”</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">parse</span> <span class="n">the</span> <span class="n">content</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;parse-the-content&quot;</span><span class="o">&gt;</span><span class="n">parse</span> <span class="n">the</span> <span class="n">content</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
 </span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">request_token</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">urlparse</span><span class="o">.</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">content</span><span class="p">))</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">print</span> <span class="s">&quot;Request Token:&quot;</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&quot;    - oauth_token        = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">]</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&quot;    - oauth_token_secret = </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token_secret&#39;</span><span class="p">]</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">print</span> <span class="err">“</span><span class="n">Request</span> <span class="n">Token</span><span class="p">:</span><span class="err">”</span>
+</span><span class='line'><span class="k">print</span> <span class="err">“</span>    <span class="o">-</span> <span class="n">oauth_token</span>        <span class="o">=</span> <span class="o">%</span><span class="n">s</span><span class="err">”</span> <span class="o">%</span> <span class="n">request_token</span><span class="p">[</span><span class="err">‘</span><span class="n">oauth_token</span><span class="err">’</span><span class="p">]</span>
+</span><span class='line'><span class="k">print</span> <span class="err">“</span>    <span class="o">-</span> <span class="n">oauth_token_secret</span> <span class="o">=</span> <span class="o">%</span><span class="n">s</span><span class="err">”</span> <span class="o">%</span> <span class="n">request_token</span><span class="p">[</span><span class="err">‘</span><span class="n">oauth_token_secret</span><span class="err">’</span><span class="p">]</span>
 </span><span class='line'><span class="k">print</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Create</span> <span class="n">the</span> <span class="n">token</span> <span class="nb">object</span> <span class="k">with</span> <span class="n">returned</span> <span class="n">oauth_token</span> <span class="ow">and</span> <span class="n">oauth_token_secret</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;create-the-token-object-with-returned-oauthtoken-and-oauthtokensecret&quot;</span><span class="o">&gt;</span><span class="n">Create</span> <span class="n">the</span> <span class="n">token</span> <span class="nb">object</span> <span class="k">with</span> <span class="n">returned</span> <span class="n">oauth_token</span> <span class="ow">and</span> <span class="n">oauth_token_secret</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">token</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Token</span><span class="p">(</span><span class="n">request_token</span><span class="p">[</span><span class="err">‘</span><span class="n">oauth_token</span><span class="err">’</span><span class="p">],</span>
+</span><span class='line'>	<span class="n">request_token</span><span class="p">[</span><span class="err">‘</span><span class="n">oauth_token_secret</span><span class="err">’</span><span class="p">])</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">token</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Token</span><span class="p">(</span><span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">],</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;you-need-to-authorize-this-app-via-your-browser&quot;</span><span class="o">&gt;</span><span class="n">You</span> <span class="n">need</span> <span class="n">to</span> <span class="n">authorize</span> <span class="n">this</span> <span class="n">app</span> <span class="n">via</span> <span class="n">your</span> <span class="n">browser</span><span class="o">.&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">print</span> <span class="err">“</span><span class="n">Go</span> <span class="n">to</span> <span class="n">the</span> <span class="n">following</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">your</span> <span class="n">browser</span><span class="p">:</span><span class="err">”</span>
+</span><span class='line'><span class="k">print</span> <span class="err">“</span><span class="o">%</span><span class="n">s</span><span class="err">?</span><span class="n">oauth_token</span><span class="o">=%</span><span class="n">s</span><span class="o">&amp;</span><span class="n">amp</span><span class="p">;</span><span class="n">perms</span><span class="o">=</span><span class="n">read</span><span class="err">”</span> <span class="o">%</span>
+</span><span class='line'>	<span class="p">(</span><span class="n">authorize_url</span><span class="p">,</span> <span class="n">request_token</span><span class="p">[</span><span class="err">‘</span><span class="n">oauth_token</span><span class="err">’</span><span class="p">])</span>
+</span><span class='line'><span class="k">print</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token_secret&#39;</span><span class="p">])</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;once-you-get-the-verified-pin-input-it&quot;</span><span class="o">&gt;</span><span class="n">Once</span> <span class="n">you</span> <span class="n">get</span> <span class="n">the</span> <span class="n">verified</span> <span class="n">pin</span><span class="p">,</span> <span class="nb">input</span> <span class="n">it</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">accepted</span> <span class="o">=</span> <span class="err">‘</span><span class="n">n</span><span class="err">’</span>
+</span><span class='line'><span class="k">while</span> <span class="n">accepted</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="err">‘</span><span class="n">n</span><span class="err">’</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">accepted</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="err">‘</span><span class="n">Have</span> <span class="n">you</span> <span class="n">authorized</span> <span class="n">me</span><span class="err">?</span> <span class="p">(</span><span class="n">y</span><span class="o">/</span><span class="n">n</span><span class="p">)</span> <span class="err">‘</span><span class="p">)</span>
+</span><span class='line'><span class="n">oauth_verifier</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="err">‘</span><span class="n">What</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">PIN</span><span class="err">?</span> <span class="err">‘</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">You</span> <span class="n">need</span> <span class="n">to</span> <span class="n">authorize</span> <span class="n">this</span> <span class="n">app</span> <span class="n">via</span> <span class="n">your</span> <span class="n">browser</span><span class="o">.&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">print</span> <span class="s">&quot;Go to the following link in your browser:&quot;</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&quot;</span><span class="si">%s</span><span class="s">?oauth_token=</span><span class="si">%s</span><span class="s">&amp;amp;perms=read&quot;</span> <span class="o">%&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="p">(</span><span class="n">authorize_url</span><span class="p">,</span> <span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">])</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">print</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Once</span> <span class="n">you</span> <span class="n">get</span> <span class="n">the</span> <span class="n">verified</span> <span class="n">pin</span><span class="p">,</span> <span class="nb">input</span> <span class="n">it</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">accepted</span> <span class="o">=</span> <span class="s">&#39;n&#39;</span>
-</span><span class='line'><span class="k">while</span> <span class="n">accepted</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s">&#39;n&#39;</span><span class="p">:</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">accepted</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&#39;Have you authorized me? (y/n) &#39;</span><span class="p">)</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">oauth_verifier</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">&#39;What is the PIN? &#39;</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="nb">set</span> <span class="n">the</span> <span class="n">oauth_verifier</span> <span class="n">token</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;set-the-oauthverifier-token&quot;</span><span class="o">&gt;</span><span class="nb">set</span> <span class="n">the</span> <span class="n">oauth_verifier</span> <span class="n">token</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
 </span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">token</span><span class="o">.</span><span class="n">set_verifier</span><span class="p">(</span><span class="n">oauth_verifier</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
@@ -720,83 +1123,43 @@ pip install -r requirements.txt
 <span class='line-number'>35</span>
 <span class='line-number'>36</span>
 <span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="c"># url to get access token</span>
+</span><span class='line'><span class="n">access_token_url</span> <span class="o">=</span> <span class="err">“</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">flickr</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">services</span><span class="o">/</span><span class="n">oauth</span><span class="o">/</span><span class="n">access_token</span><span class="err">”</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">url</span> <span class="n">to</span> <span class="n">get</span> <span class="n">access</span> <span class="n">token</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;now-you-need-to-exchange-your-request-token-for-an-access-token&quot;</span><span class="o">&gt;</span><span class="n">Now</span> <span class="n">you</span> <span class="n">need</span> <span class="n">to</span> <span class="n">exchange</span> <span class="n">your</span> <span class="n">Request</span> <span class="n">Token</span> <span class="k">for</span> <span class="n">an</span> <span class="n">Access</span> <span class="n">Token</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="c"># Set the base oauth_* parameters along with any other parameters required</span>
+</span><span class='line'><span class="c"># for the API call.</span>
+</span><span class='line'><span class="n">access_token_parms</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>	<span class="err">‘</span><span class="n">oauth_consumer_key</span><span class="err">’</span><span class="p">:</span> <span class="n">keys</span><span class="o">.</span><span class="n">apikey</span><span class="p">,</span>
+</span><span class='line'>	<span class="err">‘</span><span class="n">oauth_nonce</span><span class="err">’</span><span class="p">:</span> <span class="n">oauth</span><span class="o">.</span><span class="n">generate_nonce</span><span class="p">(),</span>
+</span><span class='line'>	<span class="err">‘</span><span class="n">oauth_signature_method</span><span class="err">’</span><span class="p">:</span><span class="err">”</span><span class="n">HMAC</span><span class="o">-</span><span class="n">SHA1</span><span class="err">”</span><span class="p">,</span>
+</span><span class='line'>	<span class="err">‘</span><span class="n">oauth_timestamp</span><span class="err">’</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())),</span>
+</span><span class='line'>	<span class="err">‘</span><span class="n">oauth_token</span><span class="err">’</span><span class="p">:</span><span class="n">request_token</span><span class="p">[</span><span class="err">‘</span><span class="n">oauth_token</span><span class="err">’</span><span class="p">],</span>
+</span><span class='line'>	<span class="err">‘</span><span class="n">oauth_verifier</span><span class="err">’</span> <span class="p">:</span> <span class="n">oauth_verifier</span>
+</span><span class='line'><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">access_token_url</span> <span class="o">=</span> <span class="s">&quot;http://www.flickr.com/services/oauth/access_token&quot;</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;setup-request&quot;</span><span class="o">&gt;</span><span class="n">setup</span> <span class="n">request</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">req</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="err">”</span><span class="n">GET</span><span class="err">”</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">access_token_url</span><span class="p">,</span>
+</span><span class='line'>	<span class="n">parameters</span><span class="o">=</span><span class="n">access_token_parms</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Now</span> <span class="n">you</span> <span class="n">need</span> <span class="n">to</span> <span class="n">exchange</span> <span class="n">your</span> <span class="n">Request</span> <span class="n">Token</span> <span class="k">for</span> <span class="n">an</span> <span class="n">Access</span> <span class="n">Token</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Set</span> <span class="n">the</span> <span class="n">base</span> <span class="n">oauth_</span><span class="o">*</span> <span class="n">parameters</span> <span class="n">along</span> <span class="k">with</span> <span class="nb">any</span> <span class="n">other</span> <span class="n">parameters</span> <span class="n">required</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="k">for</span> <span class="n">the</span> <span class="n">API</span> <span class="n">call</span><span class="o">.&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">access_token_parms</span> <span class="o">=</span> <span class="p">{</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="s">&#39;oauth_consumer_key&#39;</span><span class="p">:</span> <span class="n">keys</span><span class="o">.</span><span class="n">apikey</span><span class="p">,</span>
-</span><span class='line'><span class="s">&#39;oauth_nonce&#39;</span><span class="p">:</span> <span class="n">oauth</span><span class="o">.</span><span class="n">generate_nonce</span><span class="p">(),</span>
-</span><span class='line'><span class="s">&#39;oauth_signature_method&#39;</span><span class="p">:</span><span class="s">&quot;HMAC-SHA1&quot;</span><span class="p">,</span>
-</span><span class='line'><span class="s">&#39;oauth_timestamp&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())),</span>
-</span><span class='line'><span class="s">&#39;oauth_token&#39;</span><span class="p">:</span><span class="n">request_token</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">],</span>
-</span><span class='line'><span class="s">&#39;oauth_verifier&#39;</span> <span class="p">:</span> <span class="n">oauth_verifier</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="p">}</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">setup</span> <span class="n">request</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">req</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="n">access_token_url</span><span class="p">,</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">parameters</span><span class="o">=</span><span class="n">access_token_parms</span><span class="p">)</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">create</span> <span class="n">the</span> <span class="n">signature</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;create-the-signature-1&quot;</span><span class="o">&gt;</span><span class="n">create</span> <span class="n">the</span> <span class="n">signature</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
 </span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">signature</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">SignatureMethod_HMAC_SHA1</span><span class="p">()</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="n">consumer</span><span class="p">,</span><span class="n">token</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">assign</span> <span class="n">the</span> <span class="n">signature</span> <span class="n">to</span> <span class="n">the</span> <span class="n">request</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;assign-the-signature-to-the-request&quot;</span><span class="o">&gt;</span><span class="n">assign</span> <span class="n">the</span> <span class="n">signature</span> <span class="n">to</span> <span class="n">the</span> <span class="n">request</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">req</span><span class="p">[</span><span class="err">‘</span><span class="n">oauth_signature</span><span class="err">’</span><span class="p">]</span> <span class="o">=</span> <span class="n">signature</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">req</span><span class="p">[</span><span class="s">&#39;oauth_signature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">signature</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;make-the-request&quot;</span><span class="o">&gt;</span><span class="n">make</span> <span class="n">the</span> <span class="n">request</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">h</span> <span class="o">=</span> <span class="n">httplib2</span><span class="o">.</span><span class="n">Http</span><span class="p">(</span><span class="err">“</span><span class="o">.</span><span class="n">cache</span><span class="err">”</span><span class="p">)</span>
+</span><span class='line'><span class="n">resp</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">to_url</span><span class="p">(),</span> <span class="err">“</span><span class="n">GET</span><span class="err">”</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">make</span> <span class="n">the</span> <span class="n">request</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">h</span> <span class="o">=</span> <span class="n">httplib2</span><span class="o">.</span><span class="n">Http</span><span class="p">(</span><span class="s">&quot;.cache&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="n">resp</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">to_url</span><span class="p">(),</span> <span class="s">&quot;GET&quot;</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">parse</span> <span class="n">the</span> <span class="n">response</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;parse-the-response&quot;</span><span class="o">&gt;</span><span class="n">parse</span> <span class="n">the</span> <span class="n">response</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
 </span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">access_token_resp</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">urlparse</span><span class="o">.</span><span class="n">parse_qsl</span><span class="p">(</span><span class="n">content</span><span class="p">))</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">write</span> <span class="n">out</span> <span class="n">a</span> <span class="nb">file</span> <span class="k">with</span> <span class="n">the</span> <span class="n">oauth_token</span> <span class="ow">and</span> <span class="n">oauth_token_secret</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;token&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">access_token_resp</span><span class="p">[</span><span class="s">&#39;oauth_token&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-</span><span class='line'><span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">access_token_resp</span><span class="p">[</span><span class="s">&#39;oauth_token_secret&#39;</span><span class="p">])</span>
-</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">f</span><span class="o">.</span><span class="n">closed</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;write-out-a-file-with-the-oauthtoken-and-oauthtokensecret&quot;</span><span class="o">&gt;</span><span class="n">write</span> <span class="n">out</span> <span class="n">a</span> <span class="nb">file</span> <span class="k">with</span> <span class="n">the</span> <span class="n">oauth_token</span> <span class="ow">and</span> <span class="n">oauth_token_secret</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="err">‘</span><span class="n">token</span><span class="err">’</span><span class="p">,</span> <span class="err">‘</span><span class="n">w</span><span class="err">’</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span class='line'>	<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">access_token_resp</span><span class="p">[</span><span class="err">‘</span><span class="n">oauth_token</span><span class="err">’</span><span class="p">]</span> <span class="o">+</span> <span class="err">‘</span>\<span class="n">n</span><span class="err">’</span><span class="p">)</span>
+</span><span class='line'>	<span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">access_token_resp</span><span class="p">[</span><span class="err">‘</span><span class="n">oauth_token_secret</span><span class="err">’</span><span class="p">])</span>
+</span><span class='line'><span class="n">f</span><span class="o">.</span><span class="n">closed</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>If all the requests succeeded you should have a token file in your directory with the <em>oauth_token</em> and the <em>oauth_token_secret</em>.  You can use these tokens to make subsequent requests to the Flickr API.  In my next post, I will illustrate how to do this.</p>

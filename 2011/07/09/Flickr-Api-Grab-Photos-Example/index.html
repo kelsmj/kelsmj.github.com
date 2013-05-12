@@ -106,263 +106,259 @@
 
 <div class="entry-content"><p>In my <a href="http://mkelsey.com/2011/07/03/Flickr-oAuth-Python-Example.html">previous post</a>, I gave an example of how to authenticate a user against the Flickr API using their new OAuth authentication scheme.</p>
 
-<p>I am going to expand on that post a bit, and show you how to download all the images for a given photo using the <a href="http://www.flickr.com/services/api/explore/flickr.photos.getSizes">flickr.photos.getSizes</a> API call.</p>
+<p>I am going to expand on that post a bit, and show you how to download all the images for a given photo using the <a href="http://www.flickr.com/services/api/explore/flickr.photos.getSizes">flickr.photos.getSizes</a> API call.  </p>
 
-<p>If you followed my previous post, you should have a &#8220;token&#8221; file in your directory that contains the &#8220;oauth_token&#8221; and &#8220;oauth_token_secret&#8221; in it.  You should also have an &#8220;apikeys&#8221; file that contains your application &#8220;api_key&#8221; and &#8220;secret&#8221;.  We will need some code to read these files to get the keys and secrets.</p>
+<p>If you followed my previous post, you should have a “token” file in your directory that contains the “oauth_token” and “oauth_token_secret” in it.  You should also have an “apikeys” file that contains your application “api_key” and “secret”.  We will need some code to read these files to get the keys and secrets.</p>
 
 <p>Here is what I came up with:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">APIKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-</span><span class='line'>    <span class="sd">&quot;&quot;&quot;Base class to read the APIKeys from file&quot;&quot;&quot;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;apikeys&#39;</span><span class="p">):</span>
-</span><span class='line'>        <span class="k">try</span><span class="p">:</span>
-</span><span class='line'>            <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span class='line'>            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">EACCESS</span><span class="p">:</span>
-</span><span class='line'>                <span class="k">print</span> <span class="s">&quot;file does not exists&quot;</span>
-</span><span class='line'>            <span class="c"># Not a permission error.</span>
-</span><span class='line'>            <span class="k">raise</span>
-</span><span class='line'>        <span class="k">else</span><span class="p">:</span>
-</span><span class='line'>            <span class="k">with</span> <span class="n">fp</span><span class="p">:</span>
-</span><span class='line'>            <span class="bp">self</span><span class="o">.</span><span class="n">apikey</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-</span><span class='line'>            <span class="bp">self</span><span class="o">.</span><span class="n">apisecret</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-</span><span class='line'>            <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</span><span class='line'>              
-</span><span class='line'><span class="k">class</span> <span class="nc">TokenKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-</span><span class='line'>    <span class="sd">&quot;&quot;&quot;Base class to read the Access Tokens&quot;&quot;&quot;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;token&#39;</span><span class="p">):</span>
-</span><span class='line'>        <span class="k">try</span><span class="p">:</span>
-</span><span class='line'>            <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-</span><span class='line'>        <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span class='line'>            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">EACCESS</span><span class="p">:</span>
-</span><span class='line'>                <span class="k">print</span> <span class="s">&quot;file does not exists&quot;</span>
-</span><span class='line'>            <span class="c"># Not a permission error.</span>
-</span><span class='line'>            <span class="k">raise</span>
-</span><span class='line'>        <span class="k">else</span><span class="p">:</span>
-</span><span class='line'>            <span class="k">with</span> <span class="n">fp</span><span class="p">:</span>
-</span><span class='line'>            <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
-</span><span class='line'>            <span class="bp">self</span><span class="o">.</span><span class="n">secret</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-</span><span class='line'>            <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</span></code></pre></td></tr></table></div></figure>
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">class</span> <span class="nc">APIKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class="line">    <span class="sd">&quot;&quot;&quot;Base class to read the APIKeys from file&quot;&quot;&quot;</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;apikeys&#39;</span><span class="p">):</span>
+</span><span class="line">        <span class="k">try</span><span class="p">:</span>
+</span><span class="line">            <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+</span><span class="line">        <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span class="line">            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">EACCESS</span><span class="p">:</span>
+</span><span class="line">                <span class="k">print</span> <span class="s">&quot;file does not exists&quot;</span>
+</span><span class="line">            <span class="c"># Not a permission error.</span>
+</span><span class="line">            <span class="k">raise</span>
+</span><span class="line">        <span class="k">else</span><span class="p">:</span>
+</span><span class="line">            <span class="k">with</span> <span class="n">fp</span><span class="p">:</span>
+</span><span class="line">            <span class="bp">self</span><span class="o">.</span><span class="n">apikey</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+</span><span class="line">            <span class="bp">self</span><span class="o">.</span><span class="n">apisecret</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+</span><span class="line">            <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span><span class="line">				
+</span><span class="line"><span class="k">class</span> <span class="nc">TokenKeys</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class="line">    <span class="sd">&quot;&quot;&quot;Base class to read the Access Tokens&quot;&quot;&quot;</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;token&#39;</span><span class="p">):</span>
+</span><span class="line">        <span class="k">try</span><span class="p">:</span>
+</span><span class="line">            <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+</span><span class="line">        <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span class="line">            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">errno</span> <span class="o">==</span> <span class="n">errno</span><span class="o">.</span><span class="n">EACCESS</span><span class="p">:</span>
+</span><span class="line">                <span class="k">print</span> <span class="s">&quot;file does not exists&quot;</span>
+</span><span class="line">            <span class="c"># Not a permission error.</span>
+</span><span class="line">            <span class="k">raise</span>
+</span><span class="line">        <span class="k">else</span><span class="p">:</span>
+</span><span class="line">            <span class="k">with</span> <span class="n">fp</span><span class="p">:</span>
+</span><span class="line">            <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+</span><span class="line">            <span class="bp">self</span><span class="o">.</span><span class="n">secret</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+</span><span class="line">            <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
-
-<p>The next task at hand was coming up with a base class that can encapsulate all the work needed in order to make subsequent Flickr API calls once you have your api key and token.  I named this class &#8220;FlickrApiMethod&#8221; and it sets up all the data needed to make Flickr API requests.  It has a &#8220;makeCall&#8221; method that will make the REST call, load the returned JSON content and return True if the call was successful, or False if it was not.  I plan on expanding on this a bit to support all the different response formats that Flickr supports, but for now it just supports JSON.  This class also has an no implementation &#8220;getParameters&#8221; method that allows subclasses to fill out additional parameters that are needed for a specialized API call.</p>
+<p>The next task at hand was coming up with a base class that can encapsulate all the work needed in order to make subsequent Flickr API calls once you have your api key and token.  I named this class “FlickrApiMethod” and it sets up all the data needed to make Flickr API requests.  It has a “makeCall” method that will make the REST call, load the returned JSON content and return True if the call was successful, or False if it was not.  I plan on expanding on this a bit to support all the different response formats that Flickr supports, but for now it just supports JSON.  This class also has an no implementation “getParameters” method that allows subclasses to fill out additional parameters that are needed for a specialized API call.</p>
 
 <p>Here is the code:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">FlickrApiMethod</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-</span><span class='line'>    <span class="sd">&quot;&quot;&quot;Base class for Flickr API calls&quot;&quot;&quot;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nojsoncallback</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span><span class="n">parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-</span><span class='line'>        <span class="n">apifile</span> <span class="o">=</span> <span class="n">APIKeys</span><span class="p">()</span>
-</span><span class='line'>        <span class="n">tokenfile</span> <span class="o">=</span> <span class="n">TokenKeys</span><span class="p">()</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">consumer</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Consumer</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">apifile</span><span class="o">.</span><span class="n">apikey</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="n">apifile</span><span class="o">.</span><span class="n">apisecret</span><span class="p">)</span>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Token</span><span class="p">(</span><span class="n">tokenfile</span><span class="o">.</span><span class="n">token</span><span class="p">,</span> <span class="n">tokenfile</span><span class="o">.</span><span class="n">secret</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">if</span> <span class="n">nojsoncallback</span><span class="p">:</span>
-</span><span class='line'>            <span class="bp">self</span><span class="o">.</span><span class="n">nojsoncallback</span> <span class="o">=</span> <span class="mi">1</span>
-</span><span class='line'>        <span class="k">else</span><span class="p">:</span>
-</span><span class='line'>            <span class="bp">self</span><span class="o">.</span><span class="n">nojsoncallback</span> <span class="o">=</span> <span class="mi">0</span>
-</span><span class='line'>        <span class="k">if</span> <span class="ow">not</span> <span class="n">parameters</span><span class="p">:</span>
-</span><span class='line'>            <span class="n">parameters</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="s">&quot;http://api.flickr.com/services/rest&quot;</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class='line'>            <span class="s">&#39;format&#39;</span><span class="p">:</span><span class="n">format</span><span class="p">,</span>
-</span><span class='line'>            <span class="s">&#39;nojsoncallback&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">nojsoncallback</span><span class="p">,</span>
-</span><span class='line'>            <span class="s">&#39;oauth_timestamp&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())),</span>
-</span><span class='line'>            <span class="s">&#39;oauth_nonce&#39;</span><span class="p">:</span> <span class="n">oauth</span><span class="o">.</span><span class="n">generate_nonce</span><span class="p">(),</span>
-</span><span class='line'>            <span class="s">&#39;signature_method&#39;</span><span class="p">:</span> <span class="s">&quot;HMAC-SHA1&quot;</span><span class="p">,</span>
-</span><span class='line'>            <span class="s">&#39;oauth_token&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
-</span><span class='line'>            <span class="s">&#39;oauth_consumer_key&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">consumer</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">defaults</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">makeCall</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getParameters</span><span class="p">())</span>
-</span><span class='line'>        <span class="n">req</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">req</span><span class="p">[</span><span class="s">&#39;oauth_signature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">SignatureMethod_HMAC_SHA1</span><span class="p">()</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">consumer</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">h</span> <span class="o">=</span> <span class="n">httplib2</span><span class="o">.</span><span class="n">Http</span><span class="p">(</span><span class="s">&quot;.cache&quot;</span><span class="p">)</span>
-</span><span class='line'>        <span class="n">resp</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">to_url</span><span class="p">(),</span> <span class="s">&quot;GET&quot;</span><span class="p">)</span>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">content</span>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s">&quot;stat&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;ok&quot;</span><span class="p">:</span>
-</span><span class='line'>            <span class="k">return</span> <span class="bp">True</span>
-</span><span class='line'>        <span class="k">else</span><span class="p">:</span>
-</span><span class='line'>            <span class="k">return</span> <span class="bp">False</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">getParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span class='line'>        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-</span></code></pre></td></tr></table></div></figure>
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">class</span> <span class="nc">FlickrApiMethod</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class="line">    <span class="sd">&quot;&quot;&quot;Base class for Flickr API calls&quot;&quot;&quot;</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nojsoncallback</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span><span class="n">parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</span><span class="line">        <span class="n">apifile</span> <span class="o">=</span> <span class="n">APIKeys</span><span class="p">()</span>
+</span><span class="line">        <span class="n">tokenfile</span> <span class="o">=</span> <span class="n">TokenKeys</span><span class="p">()</span>
+</span><span class="line">
+</span><span class="line">        <span class="bp">self</span><span class="o">.</span><span class="n">consumer</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Consumer</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">apifile</span><span class="o">.</span><span class="n">apikey</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="n">apifile</span><span class="o">.</span><span class="n">apisecret</span><span class="p">)</span>
+</span><span class="line">        <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Token</span><span class="p">(</span><span class="n">tokenfile</span><span class="o">.</span><span class="n">token</span><span class="p">,</span> <span class="n">tokenfile</span><span class="o">.</span><span class="n">secret</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">        <span class="k">if</span> <span class="n">nojsoncallback</span><span class="p">:</span>
+</span><span class="line">            <span class="bp">self</span><span class="o">.</span><span class="n">nojsoncallback</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class="line">        <span class="k">else</span><span class="p">:</span>
+</span><span class="line">            <span class="bp">self</span><span class="o">.</span><span class="n">nojsoncallback</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span class="line">        <span class="k">if</span> <span class="ow">not</span> <span class="n">parameters</span><span class="p">:</span>
+</span><span class="line">            <span class="n">parameters</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span class="line">
+</span><span class="line">        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="s">&quot;http://api.flickr.com/services/rest&quot;</span>
+</span><span class="line">
+</span><span class="line">        <span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class="line">            <span class="s">&#39;format&#39;</span><span class="p">:</span><span class="n">format</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&#39;nojsoncallback&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">nojsoncallback</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&#39;oauth_timestamp&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())),</span>
+</span><span class="line">            <span class="s">&#39;oauth_nonce&#39;</span><span class="p">:</span> <span class="n">oauth</span><span class="o">.</span><span class="n">generate_nonce</span><span class="p">(),</span>
+</span><span class="line">            <span class="s">&#39;signature_method&#39;</span><span class="p">:</span> <span class="s">&quot;HMAC-SHA1&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&#39;oauth_token&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&#39;oauth_consumer_key&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">consumer</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+</span><span class="line">        <span class="p">}</span>
+</span><span class="line">
+</span><span class="line">        <span class="n">defaults</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+</span><span class="line">        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span> <span class="o">=</span> <span class="n">defaults</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">makeCall</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="line">        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getParameters</span><span class="p">())</span>
+</span><span class="line">        <span class="n">req</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">Request</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s">&quot;GET&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span>
+</span><span class="line">        <span class="n">req</span><span class="p">[</span><span class="s">&#39;oauth_signature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">oauth</span><span class="o">.</span><span class="n">SignatureMethod_HMAC_SHA1</span><span class="p">()</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">consumer</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">)</span>
+</span><span class="line">        <span class="n">h</span> <span class="o">=</span> <span class="n">httplib2</span><span class="o">.</span><span class="n">Http</span><span class="p">(</span><span class="s">&quot;.cache&quot;</span><span class="p">)</span>
+</span><span class="line">        <span class="n">resp</span><span class="p">,</span> <span class="n">content</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">to_url</span><span class="p">(),</span> <span class="s">&quot;GET&quot;</span><span class="p">)</span>
+</span><span class="line">        <span class="bp">self</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">content</span>
+</span><span class="line">        <span class="bp">self</span><span class="o">.</span><span class="n">json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s">&quot;stat&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;ok&quot;</span><span class="p">:</span>
+</span><span class="line">            <span class="k">return</span> <span class="bp">True</span>
+</span><span class="line">        <span class="k">else</span><span class="p">:</span>
+</span><span class="line">            <span class="k">return</span> <span class="bp">False</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">getParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="line">        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
+<p>Next, I will write a class, that given a unique “photo_id” it will call the <a href="http://www.flickr.com/services/api/explore/flickr.photos.getSizes">flickr.photos.getSizes</a> method and write out the files for all the sizes available.</p>
 
-<p>Next, I will write a class, that given a unique &#8220;photo_id&#8221; it will call the <a href="http://www.flickr.com/services/api/explore/flickr.photos.getSizes">flickr.photos.getSizes</a> method and write out the files for all the sizes available.</p>
-
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">FlickrPhotosGetSizes</span><span class="p">(</span><span class="n">FlickrApiMethod</span><span class="p">):</span>
-</span><span class='line'>    <span class="n">name</span> <span class="o">=</span><span class="s">&#39;flickr.photos.getSizes&#39;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nojsoncallback</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span><span class="n">parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">photo_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-</span><span class='line'>        <span class="n">FlickrApiMethod</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nojsoncallback</span><span class="p">,</span><span class="n">format</span><span class="p">,</span><span class="n">parameters</span><span class="p">)</span>
-</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">photo_id</span> <span class="o">=</span> <span class="n">photo_id</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">getParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span class='line'>        <span class="n">p</span> <span class="o">=</span><span class="p">{</span>
-</span><span class='line'>            <span class="s">&#39;method&#39;</span><span class="p">:</span><span class="s">&#39;flickr.photos.getSizes&#39;</span><span class="p">,</span>
-</span><span class='line'>            <span class="s">&#39;photo_id&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">photo_id</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">p</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">def</span> <span class="nf">writePhotos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span class='line'>        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s">&quot;sizes&quot;</span><span class="p">][</span><span class="s">&quot;size&quot;</span><span class="p">]:</span>
-</span><span class='line'>            <span class="n">opener</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">build_opener</span><span class="p">()</span>
-</span><span class='line'>            <span class="n">page</span> <span class="o">=</span> <span class="n">opener</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s">&quot;source&quot;</span><span class="p">])</span>
-</span><span class='line'>            <span class="n">my_picture</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-</span><span class='line'>            <span class="n">filename</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="s">&quot;label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;_&#39;</span><span class="p">)</span> <span class="o">+</span><span class="s">&quot;_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo_id</span> <span class="o">+</span> <span class="n">o</span><span class="p">[</span><span class="s">&quot;source&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span>
-</span><span class='line'>            <span class="k">print</span> <span class="n">filename</span>
-</span><span class='line'>            <span class="n">fout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s">&quot;wb&quot;</span><span class="p">)</span>
-</span><span class='line'>            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">my_picture</span><span class="p">)</span>
-</span><span class='line'>            <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-</span></code></pre></td></tr></table></div></figure>
-
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">class</span> <span class="nc">FlickrPhotosGetSizes</span><span class="p">(</span><span class="n">FlickrApiMethod</span><span class="p">):</span>
+</span><span class="line">    <span class="n">name</span> <span class="o">=</span><span class="s">&#39;flickr.photos.getSizes&#39;</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nojsoncallback</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span><span class="n">format</span><span class="o">=</span><span class="s">&#39;json&#39;</span><span class="p">,</span><span class="n">parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">photo_id</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</span><span class="line">        <span class="n">FlickrApiMethod</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nojsoncallback</span><span class="p">,</span><span class="n">format</span><span class="p">,</span><span class="n">parameters</span><span class="p">)</span>
+</span><span class="line">        <span class="bp">self</span><span class="o">.</span><span class="n">photo_id</span> <span class="o">=</span> <span class="n">photo_id</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">getParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="line">        <span class="n">p</span> <span class="o">=</span><span class="p">{</span>
+</span><span class="line">            <span class="s">&#39;method&#39;</span><span class="p">:</span><span class="s">&#39;flickr.photos.getSizes&#39;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&#39;photo_id&#39;</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">photo_id</span>
+</span><span class="line">        <span class="p">}</span>
+</span><span class="line">        <span class="k">return</span> <span class="n">p</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">writePhotos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="line">        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">json</span><span class="p">[</span><span class="s">&quot;sizes&quot;</span><span class="p">][</span><span class="s">&quot;size&quot;</span><span class="p">]:</span>
+</span><span class="line">            <span class="n">opener</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">build_opener</span><span class="p">()</span>
+</span><span class="line">            <span class="n">page</span> <span class="o">=</span> <span class="n">opener</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">o</span><span class="p">[</span><span class="s">&quot;source&quot;</span><span class="p">])</span>
+</span><span class="line">            <span class="n">my_picture</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span><span class="line">            <span class="n">filename</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="s">&quot;label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span> <span class="s">&#39;_&#39;</span><span class="p">)</span> <span class="o">+</span><span class="s">&quot;_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">photo_id</span> <span class="o">+</span> <span class="n">o</span><span class="p">[</span><span class="s">&quot;source&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span>
+</span><span class="line">            <span class="k">print</span> <span class="n">filename</span>
+</span><span class="line">            <span class="n">fout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s">&quot;wb&quot;</span><span class="p">)</span>
+</span><span class="line">            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">my_picture</span><span class="p">)</span>
+</span><span class="line">            <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Finally, a little bit of code to use these classes:</p>
 
-<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">print</span> <span class="s">&quot;Please enter a photo id:&quot;</span><span class="p">,</span>
-</span><span class='line'><span class="n">photoId</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">()</span>
-</span><span class='line'><span class="k">print</span> <span class="s">&quot;Fetching Photo&quot;</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">photoSizes</span> <span class="o">=</span> <span class="n">FlickrPhotosGetSizes</span><span class="p">(</span><span class="n">photo_id</span> <span class="o">=</span> <span class="n">photoId</span><span class="p">)</span>
-</span><span class='line'><span class="k">if</span><span class="p">(</span><span class="n">photoSizes</span><span class="o">.</span><span class="n">makeCall</span><span class="p">()):</span>
-</span><span class='line'>  <span class="k">print</span> <span class="s">&quot;API Call Success! Writing Photos to Disk&quot;</span>
-</span><span class='line'>  <span class="n">photoSizes</span><span class="o">.</span><span class="n">writePhotos</span><span class="p">()</span>
-</span><span class='line'><span class="k">else</span><span class="p">:</span>
-</span><span class='line'>  <span class="k">print</span> <span class="s">&quot;API Call Failed&quot;</span>
-</span><span class='line'>  
-</span></code></pre></td></tr></table></div></figure>
-
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">print</span> <span class="s">&quot;Please enter a photo id:&quot;</span><span class="p">,</span>
+</span><span class="line"><span class="n">photoId</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">()</span>
+</span><span class="line"><span class="k">print</span> <span class="s">&quot;Fetching Photo&quot;</span>
+</span><span class="line">
+</span><span class="line"><span class="n">photoSizes</span> <span class="o">=</span> <span class="n">FlickrPhotosGetSizes</span><span class="p">(</span><span class="n">photo_id</span> <span class="o">=</span> <span class="n">photoId</span><span class="p">)</span>
+</span><span class="line"><span class="k">if</span><span class="p">(</span><span class="n">photoSizes</span><span class="o">.</span><span class="n">makeCall</span><span class="p">()):</span>
+</span><span class="line">	<span class="k">print</span> <span class="s">&quot;API Call Success! Writing Photos to Disk&quot;</span>
+</span><span class="line">	<span class="n">photoSizes</span><span class="o">.</span><span class="n">writePhotos</span><span class="p">()</span>
+</span><span class="line"><span class="k">else</span><span class="p">:</span>
+</span><span class="line">	<span class="k">print</span> <span class="s">&quot;API Call Failed&quot;</span>
+</span><span class="line">	
+</span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>If all went well, you should now have files in your directory for all the different sizes of the photo you specified.</p>
 
@@ -434,6 +430,10 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/2013/05/01/authorizing-and-signing-a-twitter-api-call-using-python/">Authorizing and Signing a Twitter API Call using Python</a>
+      </li>
     
       <li class="post">
         <a href="/2013/04/30/how-i-setup-virtualenv-and-virtualenvwrapper-on-my-mac/">How I Setup VirtualEnv and VirtualEnvWrapper on my Mac</a>

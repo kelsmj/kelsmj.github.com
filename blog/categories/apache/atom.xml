@@ -4,7 +4,7 @@
   <title><![CDATA[Category: apache | Matt Kelsey]]></title>
   <link href="http://kelsmj.github.com/blog/categories/apache/atom.xml" rel="self"/>
   <link href="http://kelsmj.github.com/"/>
-  <updated>2013-05-01T06:29:50-04:00</updated>
+  <updated>2013-05-12T10:25:17-04:00</updated>
   <id>http://kelsmj.github.com/</id>
   <author>
     <name><![CDATA[Matt Kelsey]]></name>
@@ -18,19 +18,46 @@
     <link href="http://kelsmj.github.com/2011/09/16/Mac-Apache-VirtualHosts-Symlinks/"/>
     <updated>2011-09-16T14:30:00-04:00</updated>
     <id>http://kelsmj.github.com/2011/09/16/Mac-Apache-VirtualHosts-Symlinks</id>
-    <content type="html"><![CDATA[<p>I like keeping all my code and websites in a single "Code" directory on my machine, but it isn't straightforward, from what I can tell, to get Apache on the MAC
-to serve up pages anywhere outside of the default "Sites" directory that is created when you enable "Web Sharing" on the MAC.<br/>
-After doing a lot of searching, I finally found a solution that works for me.</p>
+    <content type="html"><![CDATA[<p>I like keeping all my code and websites in a single “Code” directory on my machine, but it isn’t straightforward, from what I can tell, to get Apache on the MAC 
+to serve up pages anywhere outside of the default “Sites” directory that is created when you enable “Web Sharing” on the MAC.<br />
+After doing a lot of searching, I finally found a solution that works for me. </p>
 
-<p>I doubt this is the only solution, or even the "proper" solution, but it seems to work.</p>
+<p>I doubt this is the only solution, or even the “proper” solution, but it seems to work.</p>
 
-<p>Below are all the steps I took in order to serve pages out of directories other then those in the "Sites" directory.  For these steps, I will assume there is an existing directory of "~/Code/MyWebSite" that has a simple "Hello World" index.html file in it.</p>
+<p>Below are all the steps I took in order to serve pages out of directories other then those in the “Sites” directory.  For these steps, I will assume there is an existing directory of “~/Code/MyWebSite” that has a simple “Hello World” index.html file in it.</p>
 
 <ul>
-<li><p>Enable Web Sharing on the MAC by going to System Prefrences --> Sharing --> Check Enable Web Sharing</p></li>
-<li><p>Edit your <i>username</i>.conf file located in /private/etc/apache2/users and add the "FollowSymLinks" directive</p>
+  <li>
+    <p>Enable Web Sharing on the MAC by going to System Prefrences –&gt; Sharing –&gt; Check Enable Web Sharing</p>
+  </li>
+  <li>
+    <p>Edit your <i>username</i>.conf file located in /private/etc/apache2/users and add the “FollowSymLinks” directive</p>
 
-<p>  <div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
+    <p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Directory “/Users/yourUserName/Sites/”&gt;
+</span><span class='line'>      Options Indexes MultiViews FollowSymLinks
+</span><span class='line'>      AllowOverride None
+</span><span class='line'>      Order allow,deny
+</span><span class='line'>      Allow from all
+</span><span class='line'>  &lt;/Directory&gt;</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+  </li>
+  <li>
+    <p>Edit the /private/etc/apache2/httpd.conf file and make sure the line under “# Virtual hosts” is not commented out, like so:</p>
+
+    <p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>Include /private/etc/apache2/extra/httpd-vhosts.conf</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+  </li>
+  <li>
+    <p>Edit the /private/etc/apache2/extra/httpd-vhosts.conf file and add:</p>
+
+    <p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -39,69 +66,47 @@ After doing a lot of searching, I finally found a solution that works for me.</p
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;Directory "/Users/yourUserName/Sites/">&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;pre>&lt;code>  Options Indexes MultiViews FollowSymLinks
-</span><span class='line'>  AllowOverride None
-</span><span class='line'>  Order allow,deny
-</span><span class='line'>  Allow from all
-</span><span class='line'>&lt;/code>&lt;/pre>
-</span><span class='line'>
-</span><span class='line'>&lt;p>  &lt;/Directory></span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
-<li><p>Edit the /private/etc/apache2/httpd.conf file and make sure the line under "# Virtual hosts" is not commented out, like so:</p>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;VirtualHost *:80&gt;&lt;br />
+</span><span class='line'>      &lt;Directory /Users/yourUserName/Sites/MyWebSite.com&gt;
+</span><span class='line'>          Options +FollowSymlinks +SymLinksIfOwnerMatch
+</span><span class='line'>          AllowOverride All
+</span><span class='line'>      &lt;/Directory&gt;
+</span><span class='line'>    DocumentRoot /Users/yourUserName/Sites/MyWebSite
+</span><span class='line'>    ServerName MyWebSite.local
+</span><span class='line'>  &lt;/VirtualHost&gt;</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+  </li>
+  <li>
+    <p>Edit the /etc/hosts file and add this at the top:</p>
 
-<p>  <div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
+    <p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Include /private/etc/apache2/extra/httpd-vhosts.conf</span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
-<li><p>Edit the /private/etc/apache2/extra/httpd-vhosts.conf file and add:</p>
+</pre></td><td class='code'><pre><code class=''><span class='line'>127.0.0.1 MyWebSite.local</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+  </li>
+  <li>
+    <p>Make a Symlink to link your Code directory to one in the Sites directory.</p>
 
-<p>  <div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
+    <p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>&lt;VirtualHost *:80>&lt;/p>
-</span><span class='line'>
-</span><span class='line'>&lt;pre>&lt;code>  &lt;Directory /Users/yourUserName/Sites/MyWebSite.com&gt;
-</span><span class='line'>      Options +FollowSymlinks +SymLinksIfOwnerMatch
-</span><span class='line'>      AllowOverride All
-</span><span class='line'>  &lt;/Directory&gt;
-</span><span class='line'>DocumentRoot /Users/yourUserName/Sites/MyWebSite
-</span><span class='line'>ServerName MyWebSite.local
-</span><span class='line'>&lt;/code>&lt;/pre>
-</span><span class='line'>
-</span><span class='line'>&lt;p>  &lt;/VirtualHost></span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
-<li><p>Edit the /etc/hosts file and add this at the top:</p>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ln -s ~/Code/MyWebSite ~/Sites/MyWebSite</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+  </li>
+  <li>
+    <p>Run apachectl to check config file syntax.</p>
 
-<p>  <div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
+    <p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>127.0.0.1 MyWebSite.local</span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
-<li><p>Make a Symlink to link your Code directory to one in the Sites directory.</p>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apachectl -t</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+  </li>
+  <li>
+    <p>Restart Apache</p>
 
-<p>  <div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
+    <p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>ln -s ~/Code/MyWebSite ~/Sites/MyWebSite</span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
-<li><p>Run apachectl to check config file syntax.</p>
-
-<p>  <div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apachectl -t</span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
-<li><p>Restart Apache</p>
-
-<p>  <div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>console </span></figcaption>
-<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apachectl restart</span></code></pre></td></tr></table></div></figure></notextile></div></p></li>
-<li><p>Open a browser and go to MyWebSite.local and you should see the results.</p></li>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apachectl restart</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+  </li>
+  <li>
+    <p>Open a browser and go to MyWebSite.local and you should see the results.</p>
+  </li>
 </ul>
-
 ]]></content>
   </entry>
   
