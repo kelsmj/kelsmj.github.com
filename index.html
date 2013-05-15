@@ -9,7 +9,7 @@
   <meta name="author" content="Matt Kelsey">
 
   
-  <meta name="description" content="I was reading through Twitter’s excellent documenation on Authorizing and Signing an API request and decided I wanted to give implementing it a shot &hellip;">
+  <meta name="description" content="Recently, I have been fiddling around with Flask to create some Restful API’s. I found when developing these API’s, instead of using and abusing CURL &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,442 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/2013/05/15/test-driven-development-of-a-flask-api/">Test Driven Development of a Flask API</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-15T09:21:00-04:00" pubdate data-updated="true">May 15<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Recently, I have been fiddling around with <a href="http://flask.pocoo.org/">Flask</a> to create some Restful API’s.  I found when developing these API’s, instead of using and abusing CURL commands to test the API, it was easiest to write Unit Tests as I went along in order to test and verify the routes I had were working.  The following is a commentary on how I set it all up and got it running.</p>
+
+<p>The packages I used for this setup are:</p>
+
+<ul>
+  <li><a href="http://flask.pocoo.org/">Flask</a> (pip install flask)</li>
+  <li><a href="http://flask-restful.readthedocs.org/">Flask-Restful</a> (pip install flask-restful)</li>
+  <li><a href="https://nose.readthedocs.org/en/latest/">Nose</a> (pip install nose)</li>
+  <li><a href="http://www.sqlalchemy.org/">SQLAlchemy</a> (pip install sqlalchemy)</li>
+  <li><a href="http://pythonhosted.org/Flask-SQLAlchemy/">Flask-SQLAlchemy</a> (pip install flask-sqlalchemy)</li>
+  <li><a href="http://initd.org/psycopg/">Psycopg2</a> (pip install psycopg2)</li>
+</ul>
+
+<p>First, lets create a simple postgresql database.  Since I want the test database to be separate from the main database, I am going to create one called <strong>flaskexample</strong> and one called <strong>flaskexample_test</strong>.  I will show you later on, how to specify the test database when running the nose tests.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ createuser flaskexample -P -d
+</span><span class="line">  Enter password for new role:
+</span><span class="line">  Enter it again:
+</span><span class="line">$ createdb flaskexample -U flaskexample -h localhost
+</span><span class="line">$ createdb flaskexample_test -U flaskexample -h localhost</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Now, we can create our simple flask application.  For the purposes of this blog, the flask application will only have a User table that we will go against.  Copy the code below into your application.py file, then in the console start the python interpreter and run the following:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">&gt;&gt;&gt; from application import init_db
+</span><span class="line">&gt;&gt;&gt; init_db()</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If this runs successfully, this should create your users table in your flaskexample database.</p>
+
+<p>Now for the main Flask application.  In this contrived example, we will have 2 routes to get to our user data.  We will have the <em>/users</em> route, where we can either <strong>get</strong> a list of users or <strong>post</strong> a new user.  We also have the <em>/users/&lt;string:id&gt;</em> route where we will be able to get a single user.  Our tests will center around getting a list of users, adding a user, getting a specific user, trying to add a user when an email already exists and finally deleting that user.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+<span class="line-number">62</span>
+<span class="line-number">63</span>
+<span class="line-number">64</span>
+<span class="line-number">65</span>
+<span class="line-number">66</span>
+<span class="line-number">67</span>
+<span class="line-number">68</span>
+<span class="line-number">69</span>
+<span class="line-number">70</span>
+<span class="line-number">71</span>
+<span class="line-number">72</span>
+<span class="line-number">73</span>
+<span class="line-number">74</span>
+<span class="line-number">75</span>
+<span class="line-number">76</span>
+<span class="line-number">77</span>
+<span class="line-number">78</span>
+<span class="line-number">79</span>
+<span class="line-number">80</span>
+<span class="line-number">81</span>
+<span class="line-number">82</span>
+<span class="line-number">83</span>
+<span class="line-number">84</span>
+<span class="line-number">85</span>
+<span class="line-number">86</span>
+<span class="line-number">87</span>
+<span class="line-number">88</span>
+<span class="line-number">89</span>
+<span class="line-number">90</span>
+<span class="line-number">91</span>
+<span class="line-number">92</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">import</span> <span class="nn">os</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">flask.ext</span> <span class="kn">import</span> <span class="n">restful</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">flask.ext.restful</span> <span class="kn">import</span> <span class="n">Resource</span><span class="p">,</span>  <span class="n">reqparse</span><span class="p">,</span> <span class="n">Api</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Integer</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">scoped_session</span><span class="p">,</span> <span class="n">sessionmaker</span><span class="p">,</span> <span class="n">relationship</span><span class="p">,</span> <span class="n">column_property</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span><span class="p">,</span> <span class="n">declared_attr</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sqlalchemy.exc</span> <span class="kn">import</span> <span class="n">IntegrityError</span>
+</span><span class="line">
+</span><span class="line"><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="s">&quot;flasktestexample&quot;</span><span class="p">)</span>
+</span><span class="line"><span class="n">api</span> <span class="o">=</span> <span class="n">Api</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+</span><span class="line"><span class="n">app</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="bp">True</span>
+</span><span class="line">
+</span><span class="line"><span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;DATABASE_URL&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+</span><span class="line">  <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s">&#39;postgres://flaskexample:flask@localhost:5432/flaskexample&#39;</span><span class="p">,</span> <span class="n">convert_unicode</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class="line"><span class="k">else</span><span class="p">:</span>
+</span><span class="line">  <span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;DATABASE_URL&#39;</span><span class="p">],</span> <span class="n">convert_unicode</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line"><span class="n">db_session</span> <span class="o">=</span> <span class="n">scoped_session</span><span class="p">(</span><span class="n">sessionmaker</span><span class="p">(</span><span class="n">autocommit</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+</span><span class="line">                                         <span class="n">autoflush</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+</span><span class="line">                                         <span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">))</span>
+</span><span class="line"><span class="n">Base</span> <span class="o">=</span> <span class="n">declarative_base</span><span class="p">()</span>
+</span><span class="line"><span class="n">Base</span><span class="o">.</span><span class="n">query</span> <span class="o">=</span> <span class="n">db_session</span><span class="o">.</span><span class="n">query_property</span><span class="p">()</span>
+</span><span class="line">
+</span><span class="line"><span class="nd">@app.teardown_request</span>
+</span><span class="line"><span class="k">def</span> <span class="nf">teardown_request</span><span class="p">(</span><span class="n">exception</span><span class="p">):</span>
+</span><span class="line">    <span class="n">db_session</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line"><span class="k">def</span> <span class="nf">init_db</span><span class="p">():</span>
+</span><span class="line">    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">drop_all</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+</span><span class="line">    <span class="n">Base</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line"><span class="c">#User Model</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">User</span><span class="p">(</span><span class="n">Base</span><span class="p">):</span>
+</span><span class="line">    <span class="n">__tablename__</span> <span class="o">=</span> <span class="s">&#39;users&#39;</span>
+</span><span class="line">
+</span><span class="line">    <span class="c">#from http://stackoverflow.com/a/11884806</span>
+</span><span class="line">    <span class="k">def</span> <span class="nf">as_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="line">      <span class="k">return</span> <span class="p">{</span><span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__table__</span><span class="o">.</span><span class="n">columns</span><span class="p">}</span>
+</span><span class="line">
+</span><span class="line">    <span class="nb">id</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class="line">    <span class="n">first_name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">))</span>
+</span><span class="line">    <span class="n">last_name</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">))</span>
+</span><span class="line">    <span class="n">email</span> <span class="o">=</span> <span class="n">Column</span><span class="p">(</span><span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line"><span class="c">#Parser arguments that Flask-Restful will check for</span>
+</span><span class="line"><span class="n">parser</span> <span class="o">=</span> <span class="n">reqparse</span><span class="o">.</span><span class="n">RequestParser</span><span class="p">()</span>
+</span><span class="line"><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;first_name&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&quot;First Name Cannot Be Blank&quot;</span><span class="p">)</span>
+</span><span class="line"><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;last_name&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&quot;Last Name Cannot Be Blank&quot;</span><span class="p">)</span>
+</span><span class="line"><span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">&#39;email&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s">&quot;Email Cannot Be Blank&quot;</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line"><span class="c">#Flask Restful Views</span>
+</span><span class="line"><span class="k">class</span> <span class="nc">UserView</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+</span><span class="line">    <span class="n">e</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">User</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="nb">id</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+</span><span class="line">    <span class="k">if</span> <span class="n">e</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="n">e</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()</span>
+</span><span class="line">    <span class="k">else</span><span class="p">:</span>
+</span><span class="line">      <span class="k">return</span> <span class="p">{}</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">UserViewList</span><span class="p">(</span><span class="n">Resource</span><span class="p">):</span>
+</span><span class="line">  <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="line">    <span class="n">e</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</span><span class="line">    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class="line">    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">User</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+</span><span class="line">      <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">as_dict</span><span class="p">())</span>
+</span><span class="line">    <span class="k">return</span> <span class="n">results</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span class="line">      <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+</span><span class="line">      <span class="n">o</span> <span class="o">=</span> <span class="n">User</span><span class="p">()</span>
+</span><span class="line">      <span class="n">o</span><span class="o">.</span><span class="n">first_name</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&quot;first_name&quot;</span><span class="p">]</span>
+</span><span class="line">      <span class="n">o</span><span class="o">.</span><span class="n">last_name</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&quot;last_name&quot;</span><span class="p">]</span>
+</span><span class="line">      <span class="n">o</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="s">&quot;email&quot;</span><span class="p">]</span>
+</span><span class="line">
+</span><span class="line">      <span class="k">try</span><span class="p">:</span>
+</span><span class="line">        <span class="n">db_session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+</span><span class="line">        <span class="n">db_session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</span><span class="line">      <span class="k">except</span> <span class="n">IntegrityError</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span>
+</span><span class="line">        <span class="k">return</span> <span class="p">{</span><span class="s">&quot;error&quot;</span><span class="p">:</span> <span class="n">exc</span><span class="o">.</span><span class="n">message</span><span class="p">},</span> <span class="mi">500</span>
+</span><span class="line">
+</span><span class="line">      <span class="k">return</span> <span class="n">o</span><span class="o">.</span><span class="n">as_dict</span><span class="p">(),</span> <span class="mi">201</span>
+</span><span class="line">
+</span><span class="line"><span class="c">#Flask Restful Routes</span>
+</span><span class="line"><span class="n">api</span><span class="o">.</span><span class="n">add_resource</span><span class="p">(</span><span class="n">UserViewList</span><span class="p">,</span> <span class="s">&#39;/users&#39;</span><span class="p">)</span>
+</span><span class="line"><span class="n">api</span><span class="o">.</span><span class="n">add_resource</span><span class="p">(</span><span class="n">UserView</span><span class="p">,</span> <span class="s">&#39;/users/&lt;string:id&gt;&#39;</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line"><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+</span><span class="line">    <span class="n">port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;PORT&#39;</span><span class="p">,</span> <span class="mi">5000</span><span class="p">))</span>
+</span><span class="line">    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>For the nose tests, I create a <strong>tests</strong> directory, under my application root.  For this example, we will have two files.  A <strong>__init__.py</strong> file, where we will setup the flask test client and the SQLAlchemy database session.  I also have a <strong>testusers.py</strong> file, which is where all the tests will go.  See the code blocks below.</p>
+
+<p><strong>__init__.py</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">import</span> <span class="nn">os</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">base64</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sqlalchemy.orm</span> <span class="kn">import</span> <span class="n">scoped_session</span><span class="p">,</span> <span class="n">sessionmaker</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sqlalchemy.ext.declarative</span> <span class="kn">import</span> <span class="n">declarative_base</span>
+</span><span class="line">
+</span><span class="line"><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+</span><span class="line">
+</span><span class="line"><span class="kn">from</span> <span class="nn">application</span> <span class="kn">import</span> <span class="n">init_db</span><span class="p">,</span> <span class="n">db_session</span>
+</span><span class="line">
+</span><span class="line"><span class="n">init_db</span><span class="p">()</span>
+</span><span class="line">
+</span><span class="line"><span class="kn">import</span> <span class="nn">application</span>
+</span><span class="line"><span class="n">test_app</span> <span class="o">=</span> <span class="n">application</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">test_client</span><span class="p">()</span>
+</span><span class="line">
+</span><span class="line"><span class="k">def</span> <span class="nf">teardown</span><span class="p">():</span>
+</span><span class="line">  <span class="n">db_session</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><strong>testusers.py</strong></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">import</span> <span class="nn">json</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">nose</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">nose.tools</span> <span class="kn">import</span> <span class="o">*</span>
+</span><span class="line">
+</span><span class="line"><span class="kn">from</span> <span class="nn">application</span> <span class="kn">import</span> <span class="n">User</span>
+</span><span class="line">
+</span><span class="line"><span class="kn">from</span> <span class="nn">tests</span> <span class="kn">import</span> <span class="n">test_app</span>
+</span><span class="line">
+</span><span class="line"><span class="k">def</span> <span class="nf">check_content_type</span><span class="p">(</span><span class="n">headers</span><span class="p">):</span>
+</span><span class="line">  <span class="n">eq_</span><span class="p">(</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Content-Type&#39;</span><span class="p">],</span> <span class="s">&#39;application/json&#39;</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line"><span class="k">def</span> <span class="nf">test_user_routes</span><span class="p">():</span>
+</span><span class="line">  <span class="n">rv</span> <span class="o">=</span> <span class="n">test_app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;/users&#39;</span><span class="p">)</span>
+</span><span class="line">  <span class="n">check_content_type</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+</span><span class="line">  <span class="n">resp</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+</span><span class="line">  <span class="c">#make sure we get a response</span>
+</span><span class="line">  <span class="n">eq_</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
+</span><span class="line">  <span class="c">#make sure there are no users</span>
+</span><span class="line">  <span class="n">eq_</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">resp</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">  <span class="c">#create a user</span>
+</span><span class="line">  <span class="n">d</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">first_name</span><span class="o">=</span><span class="s">&quot;User1First&quot;</span><span class="p">,</span> <span class="n">last_name</span><span class="o">=</span><span class="s">&quot;User1Last&quot;</span><span class="p">,</span><span class="n">email</span><span class="o">=</span><span class="s">&quot;User1@User1.com&quot;</span><span class="p">)</span>
+</span><span class="line">  <span class="n">rv</span> <span class="o">=</span> <span class="n">test_app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">&#39;/users&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+</span><span class="line">  <span class="n">check_content_type</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+</span><span class="line">  <span class="n">eq_</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span><span class="mi">201</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">  <span class="c">#Verify we sent the right data back</span>
+</span><span class="line">  <span class="n">resp</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+</span><span class="line">  <span class="n">eq_</span><span class="p">(</span><span class="n">resp</span><span class="p">[</span><span class="s">&quot;email&quot;</span><span class="p">],</span><span class="s">&quot;User1@User1.com&quot;</span><span class="p">)</span>
+</span><span class="line">  <span class="n">eq_</span><span class="p">(</span><span class="n">resp</span><span class="p">[</span><span class="s">&quot;first_name&quot;</span><span class="p">],</span><span class="s">&quot;User1First&quot;</span><span class="p">)</span>
+</span><span class="line">  <span class="n">eq_</span><span class="p">(</span><span class="n">resp</span><span class="p">[</span><span class="s">&quot;last_name&quot;</span><span class="p">],</span><span class="s">&quot;User1Last&quot;</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">  <span class="c">#Get users again...should have one</span>
+</span><span class="line">  <span class="n">rv</span> <span class="o">=</span> <span class="n">test_app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;/users&#39;</span><span class="p">)</span>
+</span><span class="line">  <span class="n">check_content_type</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+</span><span class="line">  <span class="n">resp</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+</span><span class="line">  <span class="c">#make sure we get a response</span>
+</span><span class="line">  <span class="n">eq_</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
+</span><span class="line">  <span class="n">eq_</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">resp</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">  <span class="c">#GET the user with specified ID</span>
+</span><span class="line">  <span class="n">rv</span> <span class="o">=</span> <span class="n">test_app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;/users/</span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">resp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&#39;id&#39;</span><span class="p">])</span>
+</span><span class="line">  <span class="n">check_content_type</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+</span><span class="line">  <span class="n">eq_</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span>
+</span><span class="line">  <span class="n">resp</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+</span><span class="line">  <span class="n">eq_</span><span class="p">(</span><span class="n">resp</span><span class="p">[</span><span class="s">&quot;email&quot;</span><span class="p">],</span><span class="s">&quot;User1@User1.com&quot;</span><span class="p">)</span>
+</span><span class="line">  <span class="n">eq_</span><span class="p">(</span><span class="n">resp</span><span class="p">[</span><span class="s">&quot;first_name&quot;</span><span class="p">],</span><span class="s">&quot;User1First&quot;</span><span class="p">)</span>
+</span><span class="line">  <span class="n">eq_</span><span class="p">(</span><span class="n">resp</span><span class="p">[</span><span class="s">&quot;last_name&quot;</span><span class="p">],</span><span class="s">&quot;User1Last&quot;</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">  <span class="c">#Try and add Duplicate User Email</span>
+</span><span class="line">  <span class="n">rv</span> <span class="o">=</span> <span class="n">test_app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s">&#39;/users&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">d</span><span class="p">)</span>
+</span><span class="line">  <span class="n">check_content_type</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span>
+</span><span class="line">  <span class="n">eq_</span><span class="p">(</span><span class="n">rv</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span><span class="mi">500</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>For the tests, I create a simple <strong>runtests.sh</strong> shell script, which is where I specify a different database to use when running tests.  It has the following line:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">DATABASE_URL=postgres://flaskexample:flask@localhost:5432/flaskexample_test nosetests --nocapture</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>When running the <strong>runtests.sh</strong> file, you should get some output like:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span>console </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">$ ./runtests.sh
+</span><span class="line">.
+</span><span class="line">----------------------------------------------------------------------
+</span><span class="line">Ran 1 test in 0.277s
+</span><span class="line">
+</span><span class="line">OK</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This means your tests have run successfully.  If you go check your <strong>flaskexample_test</strong> database, you should have one user in the <strong>Users</strong> table.  When you run the test again, that user will be removed via the init_db() call, and the tests will run against a blank database.</p>
+
+<p>Obviously, this is a very simple example, but I think it is a good starting point for setting up Test Driven Development with Flask and SQLAlchemy.</p>
+
+<p>Feel free to email me with any questions or comments.  The git repo for this is located <a href="https://github.com/kelsmj/flask-test-example">here</a></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1414,6 +1850,10 @@ After doing a lot of searching, I finally found a solution that works for me. </
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/2013/05/15/test-driven-development-of-a-flask-api/">Test Driven Development of a Flask API</a>
+      </li>
+    
+      <li class="post">
         <a href="/2013/05/01/authorizing-and-signing-a-twitter-api-call-using-python/">Authorizing and Signing a Twitter API Call using Python</a>
       </li>
     
@@ -1427,10 +1867,6 @@ After doing a lot of searching, I finally found a solution that works for me. </
     
       <li class="post">
         <a href="/2011/07/09/Flickr-Api-Grab-Photos-Example/">Download Photos From Flickr Via API</a>
-      </li>
-    
-      <li class="post">
-        <a href="/2011/07/03/Flickr-oAuth-Python-Example/">OAuth User Authentication for Flickr in Python</a>
       </li>
     
   </ul>
